@@ -1,0 +1,7 @@
+mujoco
+websocket-client
+pyserial
+approxeng.input
+matplotlib
+tk
+inputs

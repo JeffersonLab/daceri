@@ -11,12 +11,11 @@ paused = False
 
 def key_callback(keycode):
   if chr(keycode) == ' ':
-    nonlocal paused
     paused = not paused
 
 m = mujoco.MjModel.from_xml_path('xml-triangle-car.xml')
 d = mujoco.MjData(m)
-# b = mujoco.MjBody(m)
+#b = mujoco.MjsBody(m)
 
 with mujoco.viewer.launch_passive(m, d, key_callback=key_callback) as viewer:
 	# Close the viewer automatically after X wall-seconds.

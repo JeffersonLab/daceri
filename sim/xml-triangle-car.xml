@@ -29,7 +29,7 @@
 			<!-- Attach wheels to the main body -->
 			<!--							cos(15 degree)	sin(15 degree)-->
 			<body name="wheel_1_body" pos=".4 -.2325 1.05" quat="0.5 1 0 .866">
-				<joint name="joint1" type="hinge" axis="0 0 1" damping="50"/>
+				<joint name="joint1" type="hinge" axis="0 0 -1" damping="50"/>
 				<geom type="cylinder" size=".1 .0125 .01"/>
 
 				<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
@@ -517,11 +517,11 @@
 
 	<!-- attach actuators to joints -->
 	<actuator>
-		<motor name="joint1_motor" joint="joint1" ctrlrange="-75 75.0" ctrllimited="true"/>
+		<motor name="joint1_motor" joint="joint1" ctrlrange="-200 200.0" ctrllimited="true"/>
 
-		<motor name="joint2_motor" joint="joint2" ctrlrange="-75 75.0" ctrllimited="true"/>
+		<motor name="joint2_motor" joint="joint2" ctrlrange="-200 200.0" ctrllimited="true"/>
 
-		<motor name="joint3_motor" joint="joint3" ctrlrange="-75 75.0" ctrllimited="true"/>
+		<motor name="joint3_motor" joint="joint3" ctrlrange="-200 200.0" ctrllimited="true"/>
 
 	</actuator>
 
