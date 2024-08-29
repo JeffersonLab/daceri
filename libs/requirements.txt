@@ -1,7 +1,9 @@
 mujoco
 websocket-client
 pyserial
+serial
 approxeng.input
 matplotlib
 tk
 inputs
+hid

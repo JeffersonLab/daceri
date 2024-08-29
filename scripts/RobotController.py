@@ -1,24 +1,24 @@
 # This script is run on the client's machine to communicate with the websockets server on the robot.
-# It sends a websockets command which the websockets server will interpret
+# It sends a network command which the server will interpret
 # and then send a serial input into the motor controller.
+# Local serial is also available, so one can control the robot nearby with a hard-wired connection.
 
 import serial
 import socket
+import websocket
 import inputs
+from inputs import get_gamepad
+from inputs import get_key
 import time
 import math
 import sys
 import os
 import subprocess
 import threading
-from sys import platform
-from inputs import get_gamepad
-from inputs import get_key
+import platform
+
 from datetime import datetime
-
 from approxeng.input.selectbinder import ControllerResource
-
-import websocket
 
 class DetermineInput():
 	def __init__(self):
@@ -31,13 +31,22 @@ class DetermineInput():
 	def Setup(config):
 		if config == "s" or config == "S":
 			serial = Serial("/dev/ttyUSB0")
-			ControllerSupportApproxEngLib(config)
+			if platform.system() == 'Linux':
+				ControllerSupportApproxEngLib(config)
+			elif platform.system() == 'Darwin':
+				ControllerSupportHID(config)
 		elif config == "w" or config == "W":
 			web = WebSocket()
-			ControllerSupportApproxEngLib(config)
+			if platform.system() == 'Linux':
+				ControllerSupportApproxEngLib(config)
+			elif platform.system() == 'Darwin':
+				ControllerSupportHID(config)
 		elif config == "u" or config == "U":
 			udp = UDP()
-			ControllerSupportApproxEngLib(config)
+			if platform.system() == 'Linux':
+				ControllerSupportApproxEngLib(config)
+			elif platform.system() == 'Darwin':
+				ControllerSupportHID(config)
 
 class UDP():
 	UDP_IP = "192.168.1.42"
@@ -247,33 +256,30 @@ def ControllerSupportApproxEngLib(flag):
 					cmd = "set M0 " + str(P1)
 					if flag == "s":
 						Serial.WriteToSerial(cmd + '\n')
-					else:
-						if flag == "w":
-							ws.send(cmd)
-						elif flag == "u":
-							UDP.send(cmd)
+					elif flag == "w":
+						ws.send(cmd)
+					elif flag == "u":
+						UDP.send(cmd)
 
 				if( abs( P2 - last_P2 ) > deadzone ):
 					last_P2 = P2
 					cmd = "set M1 " + str(P2)
 					if flag == "s":
 						Serial.WriteToSerial(cmd + '\n')
-					else:
-						if flag == "w":
-							ws.send(cmd)
-						elif flag == "u":
-							UDP.send(cmd)
+					elif flag == "w":
+						ws.send(cmd)
+					elif flag == "u":
+						UDP.send(cmd)
 
 				if( abs( P3 - last_P3 ) > deadzone ):
 					last_P3 = P3
 					cmd = "set M3 " + str(P3) # M3 is connected to the M2 slot
 					if flag == "s":
 						Serial.WriteToSerial(cmd + '\n')
-					else:
-						if flag == "w":
-							ws.send(cmd)
-						elif flag == "u":
-							UDP.send(cmd)
+					elif flag == "w":
+						ws.send(cmd)
+					elif flag == "u":
+						UDP.send(cmd)
 		# Joystick disconnected...
 		print('Connection to joystick lost')
 	except IOError:
@@ -281,95 +287,146 @@ def ControllerSupportApproxEngLib(flag):
 		print('Unable to find any joysticks')
 		time.sleep(1.0)
 
-def KeyboardSupport():
-	while True:
-		report = get_key()
-		# print(report)
-		if report:
-			for event in report:
-				print("-------")
-				print(event.ev_type, event.code, event.state)
-				print("-------")
-				match event.code:
-					case "BTN_THUMBL":
-						SetEnableAll(0)
-						print("L3 pressed")
-					case "BTN_THUMBR":
-						SetEnableAll(1)
-						print("R3 pressed")
-					case "ABS_X":
-						if controller_type == "PS4":
-							if event.state == 0:
-								left_joy_H = event.state / MAX_JOY_VAL
-						else:
-							left_joy_H = event.state / MAX_JOY_VAL
-					case "ABS_Y":
-						left_joy_V = event.state / MAX_JOY_VAL
-					case "ABS_RX":
-						right_joy_H = event.state / MAX_JOY_VAL
-					case "ABS_RY":
-						right_joy_V = event.state / MAX_JOY_VAL
-					case "BTN_START":
-						SetEnableAll(1)
-						print("Start pressed")
-					case "ABS_LZ":
-						SetEnableAll(0)
-						print("L3 pressed")
+def LogitechGameControllerHIDReport(report):
+	state = {}
+	state['left_joy_H'] = max( (float(report[0])-128.0)/127.0, -1.0)
+	state['left_joy_V'] = max( (float(report[1])-128.0)/127.0, -1.0)
+	state['right_joy_H'] = max( (float(report[2])-128.0)/127.0, -1.0)
+	state['right_joy_V'] = max( (float(report[3])-128.0)/127.0, -1.0)
+	dpad = report[4] & 0b00001111
+	state['dpad_up'   ] = (dpad==0) or (dpad==1) or (dpad==7)
+	state['dpad_down' ] = (dpad==3) or (dpad==4) or (dpad==5)
+	state['dpad_left' ] = (dpad==5) or (dpad==6) or (dpad==7)
+	state['dpad_right'] = (dpad==1) or (dpad==2) or (dpad==3)
+	state['button_X'] = (report[4] & 0b00010000) != 0
+	state['button_A'] = (report[4] & 0b00100000) != 0
+	state['button_B'] = (report[4] & 0b01000000) != 0
+	state['button_Y'] = (report[4] & 0b10000000) != 0
+	state['bumper_left'  ] = (report[5] & 0b00000001) != 0
+	state['bumper_right' ] = (report[5] & 0b00000010) != 0
+	state['trigger_left' ] = (report[5] & 0b00000100) != 0
+	state['trigger_right'] = (report[5] & 0b00001000) != 0
+	state['back'         ] = (report[5] & 0b00010000) != 0
+	state['start'        ] = (report[5] & 0b00100000) != 0
+	state['L3'           ] = (report[5] & 0b01000000) != 0
+	state['R3'           ] = (report[5] & 0b10000000) != 0
+	return state
 
+def ControllerSupportHID(config):
+	vendor_id = 0x0
+	product_id = 0x0
+	gamepad = None
+	state = None
+	for d in hid.enumerate():
+		if d['product_string'] == 'Logitech Dual Action':
+			vendor_id  = int(d['vendor_id' ])
+			product_id = int(d['product_id'])
+			print('Found Logictech gamepad: vendor_id:0x%x product_id:0x%x' % (vendor_id, product_id))
+			gamepad = hid.Device(vid=vendor_id, pid=product_id)
+			gamepad.nonblocking = True
+	#		gamepad = hid.device()
+	#		gamepad.open(vendor_id, product_id)
+	#		gamepad.set_nonblocking(True)
+	if not gamepad:
+		print('Unable to find gamepad!')
+	else:
+		last_R3 = False
+		last_L3 = False
+		last_left_joy_V = -1
+		last_left_joy_H = -1
+		last_right_joy_V = -1
+		last_right_joy_H = -1
+
+		last_P1 = -1
+		last_P2 = -1
+		last_P3 = -1
+
+		while True:
+			report = gamepad.read(512)
+			if report:
+				state = LogitechReportToState(report)
+			else:
+				#state = None
+				time.sleep(0.050)
+				#print('Unable to get controller state')
+			if state:
+				message = ''
+
+				if state['L3']: SetEnableAll(0)
+				if state['R3']: SetEnableAll(1)
+
+#				if state['dpad_up'   ]: ws.send("incr S0  0.01")
+#				if state['dpad_down' ]: ws.send("incr S0 -0.01")
+#				if state['dpad_left' ]: ws.send("incr S1  0.01")
+#				if state['dpad_right']: ws.send("incr S1 -0.01")
+#
+#				if state['button_Y'  ]: ws.send("incr S4  0.01")
+#				if state['button_A'  ]: ws.send("incr S4 -0.01")
+#				if state['button_X'  ]: ws.send("incr S5  0.01")
+#				if state['button_B'  ]: ws.send("incr S5 -0.01")
+
+
+				# For the joysticks we implement a deadband around zero
+				# as well as the last value sent. This significantly
+				# reduces the number of messages sent.
+				left_joy_V = state['left_joy_V']
+				left_joy_H = state['left_joy_H']
+				right_joy_V = state['right_joy_V']
+				right_joy_H = state['right_joy_H']
+
+				if( abs(left_joy_V ) < 0.05 ) :  left_joy_V  = 0
+				if( abs(left_joy_H ) < 0.05 ) :  left_joy_H  = 0
+				if( abs(right_joy_V) < 0.05 ) :  right_joy_V = 0
+				if( abs(right_joy_H) < 0.05 ) :  right_joy_H = 0
 
 				P1 = (2.0/3.0)*left_joy_H+(1.0/3.0)*right_joy_H
 				P2 = (-1.0/3.0)*left_joy_H+(1.0/math.sqrt(3.0))*left_joy_V+(1.0/3.0)*right_joy_H
 				P3 = (-1.0/3.0)*left_joy_H-(1.0/math.sqrt(3.0))*left_joy_V+(1.0/3.0)*right_joy_H
 
 				# # Motors are reversed
-				P1 = -round(P1,3)
-				P2 = -round(P2,3)
-				P3 = -round(P3,3)
+				P1 = -P1
+				P2 = -P2
+				P3 = -P3
 
-				print("=======")
-				print("P1:", P1)
-				print("P2:", P2)
-				print("P3:", P3)
-				print("=======")
-
-				if( abs(P1 ) < 0.1 ) :  P1 = 0
-				if( abs(P2 ) < 0.1 ) :  P2 = 0
-				if( abs(P3 ) < 0.1 ) :  P3 = 0
+				if( abs(P1 ) < 0.05 ) :  P1 = 0
+				if( abs(P2 ) < 0.05 ) :  P2 = 0
+				if( abs(P3 ) < 0.05 ) :  P3 = 0
 
 				if( abs( P1 - last_P1 ) > 0.05 ):
-							last_P1 = P1
-							cmd = "set M0 " + str(P1)
-							ser.write((cmd + '\n').encode())
-					#while ser.in_waiting > 0:
-							#response = ser.readline().decode('utf-8').rstrip()
-							#print(f"ESP32 Response: {response}")
+					last_P1 = P1
+					cmd = "set M0 " + str(P1)
+					if flag == "s":
+						Serial.WriteToSerial(cmd + '\n')
+					elif flag == "w":
+						ws.send(cmd)
+					elif flag == "u":
+						UDP.send(cmd)
 
 				if( abs( P2 - last_P2 ) > 0.05 ):
-							last_P2 = P2
-							cmd = "set M1 " + str(P2)
-							ser.write((cmd + '\n').encode())
-					#while ser.in_waiting > 0:
-							#response = ser.readline().decode('utf-8').rstrip()
-							#print(f"ESP32 Response: {response}")
+					last_P2 = P2
+					cmd = "set M1 " + str(P2)
+					if flag == "s":
+						Serial.WriteToSerial(cmd + '\n')
+					elif flag == "w":
+						ws.send(cmd)
+					elif flag == "u":
+						UDP.send(cmd)
 
 				if( abs( P3 - last_P3 ) > 0.05 ):
-							last_P3 = P3
-							cmd = "set M3 " + str(P3)
-							ser.write((cmd + '\n').encode())
-					#while ser.in_waiting > 0:
-							#response = ser.readline().decode('utf-8').rstrip()
-							#print(f"ESP32 Response: {response}")
+					last_P3 = P3
+					cmd = "set M3 " + str(P3) # M3 is connected to the M2 slot
+					if flag == "s":
+						Serial.WriteToSerial(cmd + '\n')
+					elif flag == "w":
+						ws.send(cmd)
+					elif flag == "u":
+						UDP.send(cmd)
 
-				print("left_joy_H", left_joy_H)
-				print("left_joy_V", left_joy_V)
-				print("right_joy_H", right_joy_H)
-				print("right_joy_V", right_joy_V)
-				print("=================")
-		else:
-			#state = None
-			time.sleep(0.1)
-			#print('Unable to get controller state')
+				if message : print(message)
+				message = None
 
+#def KeyboardSupport():
+#	# TODO
 
 if __name__ == "__main__":
 	DetermineInput()
