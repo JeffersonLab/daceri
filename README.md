@@ -1,5 +1,5 @@
 # robot-project
-Any code for my robot project in affiliation with Jefferson Lab.
+Any code for the DACERI (DAta CEnter Robot Inspector) project in affiliation with Jefferson Lab.
 
 ## Run Simulation
 1. Download the respective file based on OS and architecture: [https://github.com/google-deepmind/mujoco/releases](https://github.com/google-deepmind/mujoco/releases/latest) 
@@ -13,7 +13,7 @@ Any code for my robot project in affiliation with Jefferson Lab.
 2. Go into the **designs/** directory
 3. Choose any design you'd like
 4. Open in any CAD software and export as STL
-5. Use a program like [UltiMaker Cura](https://ultimaker.com/software/ultimaker-cura/) and slice the STL file into GCODE
+5. Use a program like [UltiMaker Cura](https://ultimaker.com/software/ultimaker-cura/) or [Prusa Slicer](https://github.com/prusa3d/PrusaSlicer/releases) and slice the STL file into GCODE
 6. Run on a 3D printer
 
 ## Move the robot
@@ -32,7 +32,7 @@ Any code for my robot project in affiliation with Jefferson Lab.
      source ./.venv/bin/activate
      pip install -r ./robot-project/libs/requirements.txt
      ```
-4. Plug in a controller (OS-dependent, usually [Linux](https://www.linuxmint.com/) works the best)
+4. Plug in a controller (OS-dependent; usually [Linux](https://www.linuxmint.com/) works the best)
 5. Run the RobotController.py file (under the **scripts/** subdirectory) with the desired connection type:
    * UDP Sockets:
      ```
