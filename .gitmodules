@@ -1,0 +1,3 @@
+[submodule "CamStream"]
+	path = CamStream
+	url = https://github.com/cissieAB/CamStream.git
