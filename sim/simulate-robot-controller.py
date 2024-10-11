@@ -1,11 +1,13 @@
 import time
 import matplotlib.pyplot as plt
 import matplotlib
+from matplotlib import gridspec
 import numpy as np
 import mujoco
 import mujoco.viewer
 import math
 import glfw
+import sys
 
 from approxeng.input.selectbinder import ControllerResource
 
@@ -15,7 +17,9 @@ def key_callback(keycode):
   if chr(keycode) == ' ':
     paused = not paused
 
-m = mujoco.MjModel.from_xml_path('xml-triangle-car.xml')
+if len(sys.argv) > 1:
+	xml_path = sys.argv[1]
+m = mujoco.MjModel.from_xml_path(xml_path)
 d = mujoco.MjData(m)
 #b = mujoco.MjsBody(m)
 
@@ -79,19 +83,61 @@ with mujoco.viewer.launch_passive(m, d, key_callback=key_callback) as viewer:
 				time_until_next_step = m.opt.timestep - (time.time() - step_start)
 				if time_until_next_step > 0:
 					time.sleep(time_until_next_step)
+
 	except IOError:
 		# No joystick found, wait for a bit before trying again
 		print('Unable to find any joysticks')
 		time.sleep(1.0)
 
-
-
 	print("Total number of degrees of freedom", m.nv)
+	mujoco.mj_printData(m, d, 'test_data')
 	matplotlib.use("TkAgg")
-	plt.plot(time_matrix, pos_matrix, label='time vs. position')
-	plt.grid(True)
-	plt.xlabel("time (seconds)")
-	plt.ylabel("position (meters)")
-	#plt.plot(time_matrix, vel_matrix, label='time vs. velocity')
-	plt.legend()
+#	plt.plot(time_matrix, pos_matrix, label='time vs. position')
+#	plt.grid(True)
+#	plt.xlabel("time (seconds)")
+#	plt.ylabel("position (meters)")
+#	#plt.plot(time_matrix, vel_matrix, label='time vs. velocity')
+#	plt.legend()
+#	plt.show()
+
+	fig1=plt.figure(1)
+
+	gs = gridspec.GridSpec(2, 2)
+
+
+
+	ax0 = plt.subplot(gs[0])
+	ax1 = plt.subplot(gs[1], sharex=ax0)
+	ax2 = plt.subplot(gs[2], sharex=ax0)
+
+
+	ax0.set_title("Time vs. Pos")
+	ax1.set_title("Time vs. Vel")
+	ax2.set_title("Time vs. Acc")
+
+	ax0.set_ylabel('Position (m)', fontsize=12)
+	ax1.set_ylabel('Velocity (m/s)', fontsize=12)
+	ax2.set_ylabel('Acceleration (m/s^2)', fontsize=12)
+
+	xlabel = "Time (seconds)"
+	fig1.supxlabel(xlabel, fontsize=14) # Add the x-axis label, "fontsize" is optional
+
+
+	line0, = ax0.plot(time_matrix, pos_matrix, color='r', linestyle='--')
+	line1, = ax1.plot(time_matrix, vel_matrix, color='b', linestyle='-.')
+	line2, = ax2.plot(time_matrix, acc_matrix, color='g', linestyle=':')
+
+	ax2.legend((line0, line1, line2), ('Time vs. Pos', 'Time vs. Vel','Time vs. Acc'), loc='upper left', fontsize=10)
+
+	ax0.plot(time_matrix, pos_matrix, color='r', linestyle='--')
+
+	ax1.plot(time_matrix, vel_matrix, color='b', linestyle='-.')
+	ax2.plot(time_matrix, acc_matrix, color='g', linestyle=':')
+
+	#plt.tight_layout(pad=0.1, w_pad=0.1, h_pad=.5)
+	# remove vertical gap between subplots
+	#plt.subplots_adjust(hspace=.0)
 	plt.show()
+
+	# Plot the data on a new figure
+	fig1.show()

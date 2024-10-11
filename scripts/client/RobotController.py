@@ -183,6 +183,7 @@ def ControllerSupportApproxEngLib(flag):
 				a = joystick['cross']
 				x = joystick['square']
 				c = joystick['circle']
+				t = joystick['triangle']
 
 				if presses['ls']:
 					if flag == "s":
@@ -223,16 +224,23 @@ def ControllerSupportApproxEngLib(flag):
 							ws.send(cmd)
 						elif flag == "u":
 							UDP.send(cmd)
+				power = 1.2
+				if presses['triangle']:
+					if t is not None:
+						power = 0.5
+				else:
+					power = 1.2
 
-
-				P1 = (-1)*lx+(1.0/3.0)*rx
-				P2 = (1.0/2.0)*lx+(math.sqrt(3.0)/2)*ly+(1.0/3.0)*rx
-				P3 = (1.0/2.0)*lx-(math.sqrt(3.0)/2)*ly+(1.0/3.0)*rx
+				P1 = -(2.0/3.0)*lx+(1.0/3.0)*rx
+				P2 = (1.0/3.0)*lx+(1.0/math.sqrt(3.0))*ly+(1.0/3.0)*rx
+				P3 = (1.0/3.0)*lx-(1.0/math.sqrt(3.0))*ly+(1.0/3.0)*rx
+#				P1 = (-1)*lx+(1.0/3.0)*rx
+#				P2 = (1.0/2.0)*lx+(math.sqrt(3.0)/2)*ly+(1.0/3.0)*rx
+#				P3 = (1.0/2.0)*lx-(math.sqrt(3.0)/2)*ly+(1.0/3.0)*rx
 #				Increase power if needed
-				power = 1.1
-				P1 = power*P1
-				P2 = power*P2
-				P3 = power*P3
+				P1 = -power*P1
+				P2 = -power*P2
+				P3 = -power*P3
 
 #				print("=======")
 #				print("P1:", P1)

@@ -6,14 +6,16 @@ import mujoco
 import mujoco.viewer
 import math
 import glfw
+import sys
 
 paused = False
 
 def key_callback(keycode):
   if chr(keycode) == ' ':
     paused = not paused
-
-m = mujoco.MjModel.from_xml_path('xml-triangle-car.xml')
+if len(sys.argv) > 1:
+	xml_path = sys.argv[1]
+m = mujoco.MjModel.from_xml_path(xml_path)
 d = mujoco.MjData(m)
 #b = mujoco.MjsBody(m)
 
