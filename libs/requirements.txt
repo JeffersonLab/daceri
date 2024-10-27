@@ -7,3 +7,4 @@ matplotlib
 tk
 inputs
 hid
+mpu6050-raspberrypi
