@@ -184,6 +184,8 @@ def ControllerSupportApproxEngLib(flag):
 				x = joystick['square']
 				c = joystick['circle']
 				t = joystick['triangle']
+				l1 = joystick['l1']
+				r1 = joystick['r1']
 
 				if presses['ls']:
 					if flag == "s":
@@ -200,36 +202,13 @@ def ControllerSupportApproxEngLib(flag):
 					elif flag == "u":
 						UDP.SetEnableAllUDP(1)
 
-				if presses['cross']:
-					if a is not None:
-						cmd = "set M2 5"
-						if flag == "w":
-							ws.send(cmd)
-						elif flag == "u":
-							UDP.send(cmd)
-
-
+				power = 1
 				if presses['square']:
 					if x is not None:
-						cmd = "set M2 -5"
-						if flag == "w":
-							ws.send(cmd)
-						elif flag == "u":
-							UDP.send(cmd)
-
-				if presses['circle']:
-					if c is not None:
-						cmd = "set M2 0"
-						if flag == "w":
-							ws.send(cmd)
-						elif flag == "u":
-							UDP.send(cmd)
-				power = 1.2
-				if presses['triangle']:
-					if t is not None:
 						power = 0.5
-				else:
-					power = 1.2
+				elif presses['cross']:
+					if a is not None:
+						power = 1.2
 
 				P1 = -(2.0/3.0)*lx+(1.0/3.0)*rx
 				P2 = (1.0/3.0)*lx+(1.0/math.sqrt(3.0))*ly+(1.0/3.0)*rx
@@ -253,41 +232,75 @@ def ControllerSupportApproxEngLib(flag):
 				if( abs(P2 ) < 0.15 ) :  P2 = 0
 				if( abs(P3 ) < 0.15 ) :  P3 = 0
 
-#				if (abs(ly) > 0.9 and abs(lx) < 0.1):
-#					P1 = 0
-#					P2 = -2
-#					P3 = 2
-
 				deadzone = 0.05
-				if( abs( P1 - last_P1 ) > deadzone ):
-					last_P1 = P1
-					cmd = "set M0 " + str(P1)
-					if flag == "s":
-						Serial.WriteToSerial(cmd + '\n')
-					elif flag == "w":
-						ws.send(cmd)
-					elif flag == "u":
-						UDP.send(cmd)
+				if (P4 > 0 or P4 < 0):
+					if( abs( P1 - last_P1 ) > deadzone ):
+						last_P1 = P1
+						cmd = "set M0 " + str(P1)
+						if flag == "s":
+							Serial.WriteToSerial(cmd + '\n')
+						elif flag == "w":
+							ws.send(cmd)
+						elif flag == "u":
+							UDP.send(cmd)
 
-				if( abs( P2 - last_P2 ) > deadzone ):
-					last_P2 = P2
-					cmd = "set M1 " + str(P2)
-					if flag == "s":
-						Serial.WriteToSerial(cmd + '\n')
-					elif flag == "w":
-						ws.send(cmd)
-					elif flag == "u":
-						UDP.send(cmd)
+					if( abs( P2 - last_P2 ) > deadzone ):
+						last_P2 = P2
+						cmd = "set M1 " + str(P2)
+						if flag == "s":
+							Serial.WriteToSerial(cmd + '\n')
+						elif flag == "w":
+							ws.send(cmd)
+						elif flag == "u":
+							UDP.send(cmd)
 
-				if( abs( P3 - last_P3 ) > deadzone ):
-					last_P3 = P3
-					cmd = "set M3 " + str(P3) # M3 is connected to the M2 slot
-					if flag == "s":
-						Serial.WriteToSerial(cmd + '\n')
-					elif flag == "w":
-						ws.send(cmd)
-					elif flag == "u":
-						UDP.send(cmd)
+					if( abs( P3 - last_P3 ) > deadzone ):
+						last_P3 = P3
+						cmd = "set M3 " + str(P3) # M3 is connected to the M2 slot
+						if flag == "s":
+							Serial.WriteToSerial(cmd + '\n')
+						elif flag == "w":
+							ws.send(cmd)
+						elif flag == "u":
+							UDP.send(cmd)
+
+# We need to check the other motors when we try to turn on the drum motor so as to not burn out the L298N!
+
+#				if (P1 != 0 and P2 != 0 and P3 != 0):
+#					cmd = "set M2 0"
+#					if flag == "w":
+#						ws.send(cmd)
+#					elif flag == "u":
+#						UDP.send(cmd)
+
+				if presses['l1']:
+					if l1 is not None:
+						P4 = 5
+						if (P1 == 0 and P2 == 0 and P3 == 0):
+							cmd = "set M2 " + str(P4)
+							if flag == "w":
+								ws.send(cmd)
+							elif flag == "u":
+								UDP.send(cmd)
+
+				if presses['r1']:
+					if r1 is not None:
+						P4 = -5
+						if (P1 == 0 and P2 == 0 and P3 == 0):
+							cmd = "set M2 " + str(P4)
+							if flag == "w":
+								ws.send(cmd)
+							elif flag == "u":
+								UDP.send(cmd)
+
+				if presses['circle']:
+					if c is not None:
+						P4 = 0
+						cmd = "set M2 " + str(P4)
+						if flag == "w":
+							ws.send(cmd)
+						elif flag == "u":
+							UDP.send(cmd)
 		# Joystick disconnected...
 		print('Connection to joystick lost')
 	except IOError:

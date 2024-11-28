@@ -43,10 +43,12 @@ with mujoco.viewer.launch_passive(m, d, key_callback=key_callback) as viewer:
 				pos_matrix.append(np.mean(d.xpos))
 				print('vel:', np.mean(d.qvel))
 				vel_matrix.append(np.mean(d.qvel))
+				print('accel:', np.mean(d.qacc))
 				acc_matrix.append(np.mean(d.qacc))
 				step_start = time.time()
 				print("Current time:", time.time() - start)
 				time_matrix.append(time.time() - start)
+				print("*==*")
 
 				presses = joystick.check_presses()
 				lx, ly = joystick['l']
@@ -120,23 +122,28 @@ with mujoco.viewer.launch_passive(m, d, key_callback=key_callback) as viewer:
 	ax2.set_ylabel('Acceleration (m/s^2)', fontsize=12)
 
 	xlabel = "Time (seconds)"
+	title = "Mujoco Simulation Measurements (Collapsed Elevator)"
 	fig1.supxlabel(xlabel, fontsize=14) # Add the x-axis label, "fontsize" is optional
-
+	fig1.suptitle(title, fontsize=14)
 
 	line0, = ax0.plot(time_matrix, pos_matrix, color='r', linestyle='--')
 	line1, = ax1.plot(time_matrix, vel_matrix, color='b', linestyle='-.')
 	line2, = ax2.plot(time_matrix, acc_matrix, color='g', linestyle=':')
 
-	ax2.legend((line0, line1, line2), ('Time vs. Pos', 'Time vs. Vel','Time vs. Acc'), loc='upper left', fontsize=10)
+#	ax2.legend((line0, line1, line2), ('Time vs. Pos', 'Time vs. Vel','Time vs. Acc'), loc='upper left', fontsize=10)
 
 	ax0.plot(time_matrix, pos_matrix, color='r', linestyle='--')
-
 	ax1.plot(time_matrix, vel_matrix, color='b', linestyle='-.')
 	ax2.plot(time_matrix, acc_matrix, color='g', linestyle=':')
 
+	ax0.grid(True)
+	ax1.grid(True)
+	ax2.grid(True)
+
 	#plt.tight_layout(pad=0.1, w_pad=0.1, h_pad=.5)
 	# remove vertical gap between subplots
-	#plt.subplots_adjust(hspace=.0)
+	plt.subplots_adjust(wspace=.35)
+	plt.subplots_adjust(hspace=.3)
 	plt.show()
 
 	# Plot the data on a new figure
