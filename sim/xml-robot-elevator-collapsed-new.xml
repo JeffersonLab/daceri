@@ -9,7 +9,7 @@
 	<!-- import our stl files -->
 	<asset>
 		<mesh name="baseplate" file="baseplate_robot-new.stl" />
-		<mesh name="elevator" file="elevator-extended-new.stl" />
+		<mesh name="elevator" file="elevator-collapsed-new.stl" />
 		<mesh name="wheel" file="wheel_for_mujoco.stl" />
 	</asset>
 
@@ -26,13 +26,13 @@
 		<body name="base" pos="0 0 -0.7">
 			<joint name="joint_base" type="free" axis="0 0 1" frictionloss="1" damping="0.001" stiffness="0.2"/>
 			<geom name="baseplate_robot" type="mesh" mesh="baseplate" pos="0 0 1" friction="0.5" />
-			<inertial pos="-.05 0 0.0238" mass="5" diaginertia=".5 .5 1"/>
+			<inertial pos="-.05 0 0.0133" mass="5" diaginertia=".5 .5 1"/>
 
 			<body name="elevator" pos=".01 0 1">
 				<!--<joint name="slide_x" type="slide" axis="1 0 0" range="-.0025 .0025"/>-->
 				<joint name="slide_y" type="slide" axis="0 1 0" range="-.001 .001"/>
 				<geom name="elevator" type="mesh" mesh="elevator"/>
-				<inertial pos="0 0 .619" mass="0.2" diaginertia=".5 .5 1"/>
+				<inertial pos="0 0 0.345" mass="0.2" diaginertia=".5 .5 1"/>
 				<!-- Optional: Adding a site to specify sensor location -->
 				<site name="base_site" pos="0 0 .35" size="0.01" type="sphere" rgba="0 1 0 1"/>
 			</body>

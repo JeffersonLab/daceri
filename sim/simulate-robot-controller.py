@@ -30,26 +30,27 @@ with mujoco.viewer.launch_passive(m, d, key_callback=key_callback) as viewer:
 	vel_matrix = []
 	acc_matrix = []
 	time_matrix = []
-	limit = 500
 	time_limit = 120
+	power = 32.7
 	# Set an initial velocity for a joint (e.g., assuming joint index 0)
-	initial_velocity = 5  # set your desired initial velocity
 	print(m.actuator_user)
 	#qpos[1] shows the position of the robot baseplate
 	try:
 		with ControllerResource() as joystick:
 			while viewer.is_running() and joystick.connected and time.time() - start < time_limit:
-				print('pos (x):', np.mean(d.xpos))
-				pos_matrix.append(np.mean(d.xpos))
-				print('vel:', np.mean(d.qvel))
-				vel_matrix.append(np.mean(d.qvel))
-				print('accel:', np.mean(d.qacc))
-				acc_matrix.append(np.mean(d.qacc))
-				step_start = time.time()
-				print("Current time:", time.time() - start)
-				time_matrix.append(time.time() - start)
-				print("*==*")
+				if time.time() - start > 0.999 and time.time() - start < 30:
+					print('pos (x):', np.mean(d.xpos))
+					pos_matrix.append(np.mean(d.xpos))
+					print('vel:', np.mean(d.qvel))
+					vel_matrix.append(np.mean(d.qvel))
+					print('accel:', np.mean(d.qacc))
+					acc_matrix.append(np.mean(d.qacc))
 
+					print("Current time:", time.time() - start)
+					time_matrix.append(time.time() - start)
+					print("*==*")
+
+				step_start = time.time()
 				presses = joystick.check_presses()
 				lx, ly = joystick['l']
 				rx, ry = joystick['r']
@@ -62,9 +63,9 @@ with mujoco.viewer.launch_passive(m, d, key_callback=key_callback) as viewer:
 				P1 = (-1)*lx+(1.0/3.0)*rx
 				P2 = (1.0/2.0)*lx+(math.sqrt(3.0)/2)*ly+(1.0/3.0)*rx
 				P3 = (1.0/2.0)*lx-(math.sqrt(3.0)/2)*ly+(1.0/3.0)*rx
-				d.ctrl[0] = limit*P1
-				d.ctrl[1] = limit*P2
-				d.ctrl[2] = limit*P3
+				d.ctrl[0] = power*P1
+				d.ctrl[1] = power*P2
+				d.ctrl[2] = power*P3
 
 				#if time.time() - start > 119.999:
 				#mujoco.mj_resetData(m, d)
