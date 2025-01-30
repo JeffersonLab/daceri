@@ -17,9 +17,24 @@ Any code for the DACERI (DAta CEnter Robot Inspector) project in affiliation wit
 6. Run on a 3D printer
 
 ## Move the robot
-1. Clone this repository
-2. Go into the **scripts/** directory
-4. Use the provided Dockerfile ([Wiki: How to download and install Docker](https://docs.docker.com/get-started/get-docker/)) to automatically setup the correct packages and libraries or use a Linux/MacOS system with Python installed
+1. Clone this repository on both the client computer and the robot's R-Pi
+2. On the robot's R-Pi, run the following steps according to your desired setup:
+   * Run this first:
+     ```
+     python -m venv ./.venv --system-site-packages
+     pip install -r /path/to/daceri/libs/requirements.txt
+     source ./.venv/bin/activate
+     ```
+   * UDP Server (Modify the IP Address in the udp-server.py file to the IP of the R-Pi):
+     ```
+     python /path/to/daceri/scripts/udp-server.py
+     ```
+   * Websockets Server:
+     ```
+     python /path/to/daceri/scripts/websockets.py
+     ```
+4. Go into the **scripts/** directory
+5. Use the provided Dockerfile ([Wiki: How to download and install Docker](https://docs.docker.com/get-started/get-docker/)) to automatically setup the correct packages and libraries or use a Linux/MacOS system with Python installed
    * Container:
      ```
      cd ./robot-project
@@ -28,15 +43,15 @@ Any code for the DACERI (DAta CEnter Robot Inspector) project in affiliation wit
      ```
    * Host System (Linux/MacOS):
      ```
-     python -m ./.venv
+     python -m venv --system-site-packages ./.venv
      source ./.venv/bin/activate
-     pip install -r ./robot-project/libs/requirements.txt
+     pip install -r /path/to/daceri/libs/requirements.txt
      ```
 4. Plug in a controller (OS-dependent; usually [Linux](https://www.linuxmint.com/) works the best)
 5. Run the RobotController.py file (under the **scripts/** subdirectory) with the desired connection type:
-   * UDP Sockets:
+   * Serial Sockets:
      ```
-     python RobotController.py s [R-Pi IPv4 address]
+     python RobotController.py s
      ```
    * Websockets:
      ```
