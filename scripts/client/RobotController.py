@@ -19,6 +19,9 @@ import platform
 
 from datetime import datetime
 from approxeng.input.selectbinder import ControllerResource
+from approxeng.input.controllers import find_matching_controllers
+from approxeng.input.dualshock4 import DualShock4
+from approxeng.input.controllers import ControllerRequirement
 
 class DetermineInput():
 	def __init__(self):
@@ -30,7 +33,7 @@ class DetermineInput():
 
 	def Setup(config):
 		if config == "s" or config == "S":
-			serial = Serial("/dev/ttyUSB0")
+			serial = Serial()
 			if platform.system() == 'Linux':
 				ControllerSupportApproxEngLib(config)
 			elif platform.system() == 'Darwin':
@@ -115,11 +118,14 @@ class WebSocket():
 		for i in range(8): ws.send("enable S" + str(i) + " " + str(val))
 
 class Serial():
-	def __init__(self, path):
+	def __init__(self):
+		global ser
+		Serial.address = "/dev/ttyUSB0"
 		if len(sys.argv) > 1:
-			self.ser = serial.Serial("/dev/" + path, 115200)
+			Serial.address = sys.argv[2]
+			ser = serial.Serial(Serial.address, 115200)
 		else:
-			self.ser = serial.Serial("/dev/TTYUSB0" + path, 115200)
+			ser = serial.Serial(Serial.address, 115200)
 		print("Setting up serial, please wait...")
 		time.sleep(2)  # Wait for the serial connection to initialize
 
@@ -127,22 +133,22 @@ class Serial():
 	# SetEnableAllSerial - Only runs on serial
 	#-------------------------------------
 	def SetEnableAllSerial(value):
-		Serial.ser.write(("enable M0 " + str(value)+ '\n').encode())
-		Serial.ser.write(("enable M1 " + str(value)+ '\n').encode())
-		Serial.ser.write(("enable M2 " + str(value)+ '\n').encode())
-		Serial.ser.write(("enable M3 " + str(value)+ '\n').encode())
+		ser.write(("enable M0 " + str(value)+ '\n').encode())
+		ser.write(("enable M1 " + str(value)+ '\n').encode())
+		ser.write(("enable M2 " + str(value)+ '\n').encode())
+		ser.write(("enable M3 " + str(value)+ '\n').encode())
 
-		Serial.ser.write(("enable S0 " + str(value)+ '\n').encode())
-		Serial.ser.write(("enable S1 " + str(value)+ '\n').encode())
-		Serial.ser.write(("enable S2 " + str(value)+ '\n').encode())
-		Serial.ser.write(("enable S3 " + str(value)+ '\n').encode())
-		Serial.ser.write(("enable S4 " + str(value)+ '\n').encode())
-		Serial.ser.write(("enable S5 " + str(value)+ '\n').encode())
-		Serial.ser.write(("enable S6 " + str(value)+ '\n').encode())
-		Serial.ser.write(("enable S7 " + str(value)+ '\n').encode())
+		ser.write(("enable S0 " + str(value)+ '\n').encode())
+		ser.write(("enable S1 " + str(value)+ '\n').encode())
+		ser.write(("enable S2 " + str(value)+ '\n').encode())
+		ser.write(("enable S3 " + str(value)+ '\n').encode())
+		ser.write(("enable S4 " + str(value)+ '\n').encode())
+		ser.write(("enable S5 " + str(value)+ '\n').encode())
+		ser.write(("enable S6 " + str(value)+ '\n').encode())
+		ser.write(("enable S7 " + str(value)+ '\n').encode())
 
 	def WriteToSerial(msg):
-		Serial.ser.write((msg).encode())
+		ser.write((msg).encode())
 		#while ser.in_waiting > 0:
 			#response = ser.readline().decode('utf-8').rstrip()
 			#print(f"ESP32 Response: {response}")
@@ -171,8 +177,10 @@ def ControllerSupportApproxEngLib(flag):
 	P1 = 0
 	P2 = 0
 	P3 = 0
+	P4 = 0
+	#discoveries = find_matching_controllers()
 	try:
-		with ControllerResource() as joystick:
+		with ControllerResource(ControllerRequirement(require_class=DualShock4)) as joystick:
 			print('Found a joystick and connected')
 			while joystick.connected:
 				presses = joystick.check_presses()
@@ -186,6 +194,10 @@ def ControllerSupportApproxEngLib(flag):
 				t = joystick['triangle']
 				l1 = joystick['l1']
 				r1 = joystick['r1']
+				dup = joystick['dup']
+				ddown = joystick['ddown']
+				dleft = joystick['dleft']
+				dright = joystick['dright']
 
 				if presses['ls']:
 					if flag == "s":
@@ -201,7 +213,7 @@ def ControllerSupportApproxEngLib(flag):
 						WebSocket.SetEnableAllWebSockets(1)
 					elif flag == "u":
 						UDP.SetEnableAllUDP(1)
-
+				#if joystick.releases.ddown:
 				power = 1
 				if presses['square']:
 					if x is not None:
@@ -209,6 +221,42 @@ def ControllerSupportApproxEngLib(flag):
 				elif presses['cross']:
 					if a is not None:
 						power = 1.2
+				elif presses['dup']:
+					if dup is not None:
+						cmd = "set S4 .05"
+						if flag == "s":
+							Serial.WriteToSerial(cmd + '\n')
+						elif flag == "w":
+							ws.send(cmd)
+						elif flag == "u":
+							UDP.send(cmd)
+				elif presses['ddown']:
+					if ddown is not None:
+						cmd = "set S4 -.05"
+						if flag == "s":
+							Serial.WriteToSerial(cmd + '\n')
+						elif flag == "w":
+							ws.send(cmd)
+						elif flag == "u":
+							UDP.send(cmd)
+				elif presses['dleft']:
+					if dleft is not None:
+						cmd = "set S3 -.05"
+						if flag == "s":
+							Serial.WriteToSerial(cmd + '\n')
+						elif flag == "w":
+							ws.send(cmd)
+						elif flag == "u":
+							UDP.send(cmd)
+				elif presses['dright']:
+					if dright is not None:
+						cmd = "set S3 .05"
+						if flag == "s":
+							Serial.WriteToSerial(cmd + '\n')
+						elif flag == "w":
+							ws.send(cmd)
+						elif flag == "u":
+							UDP.send(cmd)
 
 				P1 = -(2.0/3.0)*lx+(1.0/3.0)*rx
 				P2 = (1.0/3.0)*lx+(1.0/math.sqrt(3.0))*ly+(1.0/3.0)*rx
@@ -233,7 +281,7 @@ def ControllerSupportApproxEngLib(flag):
 				if( abs(P3 ) < 0.15 ) :  P3 = 0
 
 				deadzone = 0.05
-				if (P4 > 0 or P4 < 0):
+				if (P4 == 0):
 					if( abs( P1 - last_P1 ) > deadzone ):
 						last_P1 = P1
 						cmd = "set M0 " + str(P1)
@@ -264,21 +312,16 @@ def ControllerSupportApproxEngLib(flag):
 						elif flag == "u":
 							UDP.send(cmd)
 
-# We need to check the other motors when we try to turn on the drum motor so as to not burn out the L298N!
-
-#				if (P1 != 0 and P2 != 0 and P3 != 0):
-#					cmd = "set M2 0"
-#					if flag == "w":
-#						ws.send(cmd)
-#					elif flag == "u":
-#						UDP.send(cmd)
+				# We need to check the other motors when we try to turn on the drum motor so as to not burn out the L298N!
 
 				if presses['l1']:
 					if l1 is not None:
 						P4 = 5
 						if (P1 == 0 and P2 == 0 and P3 == 0):
 							cmd = "set M2 " + str(P4)
-							if flag == "w":
+							if flag == "s":
+								Serial.WriteToSerial(cmd + '\n')
+							elif flag == "w":
 								ws.send(cmd)
 							elif flag == "u":
 								UDP.send(cmd)
@@ -288,7 +331,9 @@ def ControllerSupportApproxEngLib(flag):
 						P4 = -5
 						if (P1 == 0 and P2 == 0 and P3 == 0):
 							cmd = "set M2 " + str(P4)
-							if flag == "w":
+							if flag == "s":
+								Serial.WriteToSerial(cmd + '\n')
+							elif flag == "w":
 								ws.send(cmd)
 							elif flag == "u":
 								UDP.send(cmd)
@@ -296,8 +341,12 @@ def ControllerSupportApproxEngLib(flag):
 				if presses['circle']:
 					if c is not None:
 						P4 = 0
-						cmd = "set M2 " + str(P4)
-						if flag == "w":
+						S0 = 0
+						S1 = 0
+						cmd = "set M2 " + str(P4) + '\n' + "set S0 " + str(S0) + '\n' "set S1 " + str(S1)
+						if flag == "s":
+							Serial.WriteToSerial(cmd + '\n')
+						elif flag == "w":
 							ws.send(cmd)
 						elif flag == "u":
 							UDP.send(cmd)
