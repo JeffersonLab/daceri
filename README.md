@@ -2,7 +2,7 @@
 Any code for the DACERI (DAta CEnter Robot Inspector) project in affiliation with Jefferson Lab.
 
 ## Run Simulation
-1. Download the respective file based on OS and architecture: [https://github.com/google-deepmind/mujoco/releases](https://github.com/google-deepmind/mujoco/releases/latest) 
+1. Download the respective file based on OS and architecture: [https://github.com/google-deepmind/mujoco/releases](https://github.com/google-deepmind/mujoco/releases/latest)
 2. Extract the file, and run **simulate** inside the extracted folder. Mujoco simulator should run
 3. Clone this repository
 4. Go into the **sim/** directory
@@ -49,7 +49,11 @@ Any code for the DACERI (DAta CEnter Robot Inspector) project in affiliation wit
      ```
 4. Plug in a controller (OS-dependent; usually [Linux](https://www.linuxmint.com/) works the best)
 5. Run the RobotController.py file (under the **scripts/** subdirectory) with the desired connection type:
+<<<<<<< Updated upstream
    * Serial Sockets:
+=======
+   * Serial:
+>>>>>>> Stashed changes
      ```
      python RobotController.py s
      ```
