@@ -180,7 +180,8 @@ def ControllerSupportApproxEngLib(flag):
 	P4 = 0
 	#discoveries = find_matching_controllers()
 	try:
-		with ControllerResource(ControllerRequirement(require_class=DualShock4)) as joystick:
+		#To specifically use PS4 controllers: with ControllerResource(ControllerRequirement(require_class=DualShock4)) as joystick:
+		with ControllerResource() as joystick:
 			print('Found a joystick and connected')
 			while joystick.connected:
 				presses = joystick.check_presses()
@@ -194,10 +195,12 @@ def ControllerSupportApproxEngLib(flag):
 				t = joystick['triangle']
 				l1 = joystick['l1']
 				r1 = joystick['r1']
-				dup = joystick['dup']
-				ddown = joystick['ddown']
-				dleft = joystick['dleft']
-				dright = joystick['dright']
+
+#				For PS4 Controllers:
+#				dup = joystick['dup']
+#				ddown = joystick['ddown']
+#				dleft = joystick['dleft']
+#				dright = joystick['dright']
 
 				if presses['ls']:
 					if flag == "s":
@@ -221,42 +224,44 @@ def ControllerSupportApproxEngLib(flag):
 				elif presses['cross']:
 					if a is not None:
 						power = 1.2
-				elif presses['dup']:
-					if dup is not None:
-						cmd = "set S4 .05"
-						if flag == "s":
-							Serial.WriteToSerial(cmd + '\n')
-						elif flag == "w":
-							ws.send(cmd)
-						elif flag == "u":
-							UDP.send(cmd)
-				elif presses['ddown']:
-					if ddown is not None:
-						cmd = "set S4 -.05"
-						if flag == "s":
-							Serial.WriteToSerial(cmd + '\n')
-						elif flag == "w":
-							ws.send(cmd)
-						elif flag == "u":
-							UDP.send(cmd)
-				elif presses['dleft']:
-					if dleft is not None:
-						cmd = "set S3 -.05"
-						if flag == "s":
-							Serial.WriteToSerial(cmd + '\n')
-						elif flag == "w":
-							ws.send(cmd)
-						elif flag == "u":
-							UDP.send(cmd)
-				elif presses['dright']:
-					if dright is not None:
-						cmd = "set S3 .05"
-						if flag == "s":
-							Serial.WriteToSerial(cmd + '\n')
-						elif flag == "w":
-							ws.send(cmd)
-						elif flag == "u":
-							UDP.send(cmd)
+
+#				For PS4 Controllers:
+#				elif presses['dup']:
+#					if dup is not None:
+#						cmd = "set S4 .05"
+#						if flag == "s":
+#							Serial.WriteToSerial(cmd + '\n')
+#						elif flag == "w":
+#							ws.send(cmd)
+#						elif flag == "u":
+#							UDP.send(cmd)
+#				elif presses['ddown']:
+#					if ddown is not None:
+#						cmd = "set S4 -.05"
+#						if flag == "s":
+#							Serial.WriteToSerial(cmd + '\n')
+#						elif flag == "w":
+#							ws.send(cmd)
+#						elif flag == "u":
+#							UDP.send(cmd)
+#				elif presses['dleft']:
+#					if dleft is not None:
+#						cmd = "set S3 -.05"
+#						if flag == "s":
+#							Serial.WriteToSerial(cmd + '\n')
+#						elif flag == "w":
+#							ws.send(cmd)
+#						elif flag == "u":
+#							UDP.send(cmd)
+#				elif presses['dright']:
+#					if dright is not None:
+#						cmd = "set S3 .05"
+#						if flag == "s":
+#							Serial.WriteToSerial(cmd + '\n')
+#						elif flag == "w":
+#							ws.send(cmd)
+#						elif flag == "u":
+#							UDP.send(cmd)
 
 				P1 = -(2.0/3.0)*lx+(1.0/3.0)*rx
 				P2 = (1.0/3.0)*lx+(1.0/math.sqrt(3.0))*ly+(1.0/3.0)*rx
