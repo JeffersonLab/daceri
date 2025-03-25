@@ -7,3 +7,5 @@ tk
 inputs
 hid
 mpu6050-raspberrypi
+ipython
+REVHubInterface
