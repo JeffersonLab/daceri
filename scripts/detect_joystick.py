@@ -95,6 +95,7 @@ gamepad = None
 state = None
 for d in hid.enumerate():
     if d['product_string'] == 'Logitech Dual Action':
+        print(f"vid={d['vendor_id' ]}, pid={d['product_id']}")
         vendor_id  = int(d['vendor_id' ])
         product_id = int(d['product_id'])
         print('Found Logictech gamepad: vendor_id:0x%x product_id:0x%x' % (vendor_id, product_id))
