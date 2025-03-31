@@ -5,7 +5,7 @@
 #
 # Install the uderlying system-level hidapi support. The process has been tested on a RHEL 8.6
 # (Linux 4.8 kernel) and MacOS 15.3.2.
-# 
+#
 # For RHEL Linux OS
 # 1. sudo dnf groupinstall "Development Tools"
 # 2. sudo dnf install libusb-devel
@@ -98,10 +98,9 @@ for d in hid.enumerate():
         print(f"vid={d['vendor_id' ]}, pid={d['product_id']}, path={d['path']}")
         vendor_id  = int(d['vendor_id' ])
         product_id = int(d['product_id'])
-        print('Found Logictech gamepad: vendor_id:0x%x product_id:0x%x' % (vendor_id, product_id))
         path = d['path']
-        # gamepad = hid.Device(vid=vendor_id, pid=product_id)  # raise "Unableto open Device error on RASP Pi
-        gamepad = hid.Device(path=path)
+        print('Found Logictech gamepad: vendor_id:0x%x product_id:0x%x'% (vendor_id, product_id))
+        gamepad = hid.Device(path=path)  # Check the path permission if there is HID "Unable to open device" error
         gamepad.nonblocking = True
 #        gamepad = hid.device()
 #        gamepad.open(vendor_id, product_id)
