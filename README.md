@@ -12,12 +12,15 @@ git submodule update --init  # Clone the submodules
 - `REVHubInterface`: The Python module for the REV Control Hub. By running `python -m REVHubInterface`, you should be able to see a GUI that can take the inputs from the GUI and control the Robot motors.
 
 ## Scripts
-- [detect_joystick.py](./scripts/detect_joystick.py): Use the Python `hid` library to detect the Logitech F310 Game Controller,  translate its inputs to a string and print the string to the screen.
+- [motor_test.py](./scripts/motor_test.py): Control one of the wheels (motors) with `REVHubInterface` without launching the GUI. If succeeded, the wheel will run for 3 seconds.
+- [detect_joystick.py](./scripts/detect_joystick.py): Use the Python `hid` library to detect the Logitech F310 Game Controller, translate its inputs to a string and print the string to the screen.
 
-### Fix the `/dev/hidraw*` permission
-If you can print the gampad's vendor id and product id to the screen but it raises "Unable to open device" error, that is related to the permission for the gamepad device.
+### Notes
+#### **Fix the `/dev/hidraw*` permission**
 
-Check it with `ls -l /dev/hidraw*` (hidraw1 in our case). If it’s owned by root or another group, and your user can’t access it. Fix it by:
+If you can print the gampad's vendor id and product id to the screen but it raises `HIDException` "Unable to open device" error, that is related to the permission for the device.
+
+Check it with `ls -l /dev/hidraw*` (`hidraw1` in our case). If it’s owned by `root` or another group, the user can’t access it. Fix it by:
 
 1. Create a udev rule: `sudo nano /etc/udev/rules.d/99-logitech-f310.rules`
 2. In this rule file, add:
@@ -31,4 +34,4 @@ Check it with `ls -l /dev/hidraw*` (hidraw1 in our case). If it’s owned by roo
     sudo udevadm trigger
     ```
 
-Rerun the Python script and the HIDException should be gone.
+Rerun the Python script and the `HIDException` error should be gone.
