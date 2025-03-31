@@ -95,11 +95,13 @@ gamepad = None
 state = None
 for d in hid.enumerate():
     if d['product_string'] == 'Logitech Dual Action':
-        print(f"vid={d['vendor_id' ]}, pid={d['product_id']}")
+        print(f"vid={d['vendor_id' ]}, pid={d['product_id']}, path={d['path'}")
         vendor_id  = int(d['vendor_id' ])
         product_id = int(d['product_id'])
         print('Found Logictech gamepad: vendor_id:0x%x product_id:0x%x' % (vendor_id, product_id))
-        gamepad = hid.Device(vid=vendor_id, pid=product_id)
+        path = d['path']
+        # gamepad = hid.Device(vid=vendor_id, pid=product_id)  # raise "Unableto open Device error on RASP Pi
+        gamepad = hid.Device(path=path)
         gamepad.nonblocking = True
 #        gamepad = hid.device()
 #        gamepad.open(vendor_id, product_id)
