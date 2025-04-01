@@ -78,6 +78,7 @@ def get_gamepad_state(report):
     state['R3'           ] = (report[5] & 0b10000000) != 0
     return state
 
+
 #-------------------------------------
 # SetEnableAll
 #-------------------------------------
@@ -86,6 +87,7 @@ def set_gamepad_enable_all(val):
         print("enable M" + str(i) + " " + str(val))
     for i in range(8):
         print("enable S" + str(i) + " " + str(val))
+
 
 # Setup HID (game controller)
 # Find Logitech device
@@ -100,11 +102,9 @@ for d in hid.enumerate():
         product_id = int(d['product_id'])
         path = d['path']
         print('Found Logictech gamepad: vendor_id:0x%x product_id:0x%x'% (vendor_id, product_id))
-        gamepad = hid.Device(path=path)  # Check the path permission if there is HID "Unable to open device" error
+        # NOTE: Check the path permission if there is HID "Unable to open device" error
+        gamepad = hid.Device(path=path)
         gamepad.nonblocking = True
-#        gamepad = hid.device()
-#        gamepad.open(vendor_id, product_id)
-#        gamepad.set_nonblocking(True)
 if not gamepad:
     print('Unable to find gamepad!')
 else:
@@ -172,24 +172,21 @@ else:
 
             if( abs( P1 - last_P1 ) > 0.05 ):
                 last_P1 = P1
-                cmd = "set M0 " + str(P1)
-                print(cmd)
+                cmd = "set M1 " + str(P1)
                 print(cmd)
             if( abs( P2 - last_P2 ) > 0.05 ):
                 last_P2 = P2
-                cmd = "set M1 " + str(P2)
-                print(cmd)
+                cmd = "set M2 " + str(P2)
                 print(cmd)
             if( abs( P3 - last_P3 ) > 0.05 ):
                 last_P3 = P3
                 cmd = "set M3 " + str(P3)
                 print(cmd)
-                print(cmd)
             if( abs( right_joy_H - last_right_joy_H ) > 0.05 ):
                 last_right_joy_H = right_joy_H
                 cmd = "set M3 " + str(last_right_joy_H)
                 print(cmd)
-                #print(cmd)
-  
-            if message : print(message)
+            if message:
+                print(message)
+
             message = None
