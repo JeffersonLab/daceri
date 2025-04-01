@@ -91,23 +91,33 @@ def set_gamepad_enable_all(val):
 
 # Setup HID (game controller)
 # Find Logitech device
-vendor_id = 0x0
-product_id = 0x0
-gamepad = None
-state = None
-for d in hid.enumerate():
-    if d['product_string'] == 'Logitech Dual Action':
-        print(f"vid={d['vendor_id' ]}, pid={d['product_id']}, path={d['path']}")
-        vendor_id  = int(d['vendor_id' ])
-        product_id = int(d['product_id'])
-        path = d['path']
-        print('Found Logictech gamepad: vendor_id:0x%x product_id:0x%x'% (vendor_id, product_id))
-        # NOTE: Check the path permission if there is HID "Unable to open device" error
-        gamepad = hid.Device(path=path)
-        gamepad.nonblocking = True
-if not gamepad:
+def get_gamepad():
+    """
+    Find the Logitech game controller and return the device object.
+    """
+    gamepad = None
+    for d in hid.enumerate():
+        if d['product_string'] == 'Logitech Dual Action':
+            # print(f"vid={d['vendor_id' ]}, pid={d['product_id']}, path={d['path']}")
+            vendor_id  = int(d['vendor_id' ])
+            product_id = int(d['product_id'])
+            path = d['path']
+            print('Found Logictech gamepad: vendor_id: [0x%x], product_id:[0x%x]'%(vendor_id, product_id))
+            # NOTE: Check the path permission if there is HID "Unable to open device" error
+            gamepad = hid.Device(path=path)
+            gamepad.nonblocking = True
+    return gamepad
+
+
+#-------------------------------------
+# Main
+#-------------------------------------
+gpad = get_gamepad()
+if gpad is None:
     print('Unable to find gamepad!')
+    sys.exit(2)
 else:
+    state = None
     last_R3 = False
     last_L3 = False
     last_left_joy_V = -1
@@ -120,7 +130,7 @@ else:
     last_P3 = -1
 
     while True:
-        report = gamepad.read(512)
+        report = gpad.read(512)
         if report:
             state = get_gamepad_state(report)
         else:
