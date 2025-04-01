@@ -18,7 +18,7 @@ git submodule update --init  # Clone the submodules
 ### Notes
 #### **Fix the `/dev/hidraw*` permission**
 
-If you can print the gampad's vendor id and product id to the screen but it raises `HIDException` "Unable to open device" error, that is related to the permission for the device.
+If you can print the gampad's vendor id and product id to the screen but it raises `HIDException` "Unable to open device", that is related to the permission for the device.
 
 Check it with `ls -l /dev/hidraw*` (`hidraw1` in our case). If it’s owned by `root` or another group, the user can’t access it. Fix it by:
 
