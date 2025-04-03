@@ -4,7 +4,7 @@ The GamePad Module to find the device and get its report.
 
 import hid
 
-PRODUCT_STR = 'Logitech Dual Action'
+GAMEPAD_PRODUCT_STR = 'Logitech Dual Action'
 
 
 class GamePadDevice:
@@ -22,7 +22,7 @@ class GamePadDevice:
             Retrieves the raw input report from the connected game controller.
     """
 
-    def __init__(self, product_str=PRODUCT_STR):
+    def __init__(self, product_str=GAMEPAD_PRODUCT_STR):
         self.gamepad = None
 
         for d in hid.enumerate():
@@ -31,10 +31,18 @@ class GamePadDevice:
                 product_id = int(d['product_id'])
                 path = d['path']
                 print(f"Found Logitech gamepad: vendor_id: [0x{vendor_id:x}], product_id: [0x{product_id:x}]")
-                print(f"Device path: {str(path)}")
+                print(f"Device path: {str(path)}\n")
                 # NOTE: Check the path permission if there is HID "Unable to open device" error
                 self.gamepad = hid.Device(path=path)
                 self.gamepad.nonblocking = True
+
+        if self.gamepad is None:
+            print("Unable to find gamepad!")
+            raise RuntimeError("GamePadDevice initialization failed.")
+
+        print("GamePadDevice initialized.")
+        print("Print 'L3' to enable all motors.")
+        print("Print 'R3' to enable all servos.")
 
     def get_gamepad_report(self):
         """Get the raw report from the gamepad device."""
