@@ -4,15 +4,21 @@ The REVHub is connected to the PI directly.
 """
 
 import sys
+import time
+
+# Self-defined submoduels
 import GamePad
 
 # Main function
-gamepad = GamePad.GamePadDevice()
+gpad_device = GamePad.GamePadDevice()
 
-if gamepad.get_gamepad_device() is None:
+if gpad_device.gamepad is None:
     print('Unable to find gamepad!')
     sys.exit(2)
 
 # Get the REVHubModule
 while True:
-    report = gamepad.get_gamepad_report()
+    report = gpad_device.get_gamepad_report()
+    if report != b'':
+        print(report)
+    time.sleep(1)
