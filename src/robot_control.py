@@ -35,7 +35,7 @@ class MyREVModule:
             comm.openActivePort()
             rev_modules = comm.discovery()
 
-            print(f"Totoal modules: {len(rev_modules)}. Init the first one")
+            print(f"Totoal modules: {len(rev_modules)}. Init the first one\n")
             self.module = rev_modules[0]
 
         except Exception as e:
