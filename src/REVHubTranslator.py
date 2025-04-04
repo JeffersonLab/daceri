@@ -9,6 +9,35 @@ import math
 MOTOR_NUM = 3
 MOTOR_INIT_SPEED = -1.0
 
+class ServoInput:
+    """Represents the input for a single servo, including its ID and position."""
+    def __init__(self, sid=-1):
+        """
+        Initialize a ServoInput instance.
+        Args:
+            sid (int): Servo ID. Valid IDs are 0, 1, and 2. Defaults to -1.
+        """
+        self.sid = sid
+        self.period_inc = 0.0  # Servo period increment decied by the GamePad report
+
+
+class REVServoInputs:
+    """Manages inputs for multiple servos on the robot."""
+    def __init__(self):
+        # Match David's code at
+        #  https://github.com/faustus123/HLRobotController/blob/main/scripts/tri_wheel_robot.py
+        self.inputs_dict = {}
+        for sid in [0, 1, 4, 5]:
+            self.inputs_dict['S' + str(sid)] = ServoInput(sid)
+
+    def print_inputs(self):
+        """
+        Print the current servo inputs, including servo IDs and period increments.
+        """
+        print("\nServo inputs:")
+        for key, servo_input in self.inputs_dict.items():
+            print(f"\t{key}: period_inc={servo_input.period_inc}")
+
 
 class MotorInput:
     """Represents the input for a single motor, including its ID and speed."""
@@ -24,22 +53,22 @@ class MotorInput:
         self.speed = MOTOR_INIT_SPEED
 
 
-class REVMotorControllerInputs:
+class REVMotorInputs:
     """Manages inputs for multiple motors on the robot."""
     def __init__(self):
         """
         Initialize the motor controller inputs with a predefined number of motors.
         """
-        self.motors = []
+        self.inputs = []
         for i in range(MOTOR_NUM):
-            self.motors.append(MotorInput(i))
+            self.inputs.append(MotorInput(i))
 
     def print_inputs(self):
         """
         Print the current motor inputs, including motor IDs and speeds.
         """
-        for i, motor in enumerate(self.motors):
-            print(f"Motor input: ID = {motor.mid}, Speed = {motor.speed}")
+        for i in self.inputs:
+            print(f"Motor input: ID = {i.mid}, Speed = {i.speed}")
 
 
 class REVHubInputsTranslator:
@@ -59,7 +88,9 @@ class REVHubInputsTranslator:
         self.curr_joy_values = self.last_joy_values
 
         self.last_motor_speeds = [MOTOR_INIT_SPEED , MOTOR_INIT_SPEED , MOTOR_INIT_SPEED ]
-        self.curr_motor_inputs = REVMotorControllerInputs()
+        self.curr_motor_inputs = REVMotorInputs()
+
+        self.curr_servo_inputs = REVServoInputs()
 
     def get_raw_state_from_report(self, gpd_report):
         """
@@ -98,14 +129,14 @@ class REVHubInputsTranslator:
         Check if servo inputs are enabled based on the GamePad state.
         """
         if self.raw_state['R3']:
-            print("\tEnable all servos")
+            print("\nEnable all servos\n")
 
     def is_motor_inputs_enabled(self):
         """
         Check if motor inputs are enabled based on the GamePad state.
         """
         if self.raw_state['L3']:
-            print("\tEnable all motors")
+            print("\nEnable all motors\n")
 
     def print_report_n_state(self, report):
         """
@@ -117,6 +148,34 @@ class REVHubInputsTranslator:
         print(report)
         self.get_raw_state_from_report(report)
         print(self.raw_state)
+
+    def get_servo_inputs(self, print_input=False):
+        """
+        Update the servo inputs based on the GamePad state.
+        """
+        # Servo 0: S0
+        if self.raw_state['dpad_up']:
+            self.curr_servo_inputs.inputs_dict['S0'].period_inc = 0.01
+        if self.raw_state['dpad_down']:
+            self.curr_servo_inputs.inputs_dict['S0'].period_inc = -0.01
+        # Servo 1: S1
+        if self.raw_state['dpad_left']:
+            self.curr_servo_inputs.inputs_dict['S1'].period_inc = 0.01
+        if self.raw_state['dpad_right']:
+            self.curr_servo_inputs.inputs_dict['S1'].period_inc = -0.01
+        # Servo 4: S4
+        if self.raw_state['button_Y']:
+            self.curr_servo_inputs.inputs_dict['S4'].period_inc = 0.01
+        if self.raw_state['button_A']:
+            self.curr_servo_inputs.inputs_dict['S4'].period_inc = -0.01
+        # Servo 5: S5
+        if self.raw_state['button_X']:
+            self.curr_servo_inputs.inputs_dict['S5'].period_inc = 0.01
+        if self.raw_state['button_B']:
+            self.curr_servo_inputs.inputs_dict['S5'].period_inc = -0.01
+
+        if print_input:
+            self.curr_servo_inputs.print_inputs()
 
     def get_curr_joy_values(self):
         """
@@ -180,7 +239,7 @@ class REVHubInputsTranslator:
 
             if abs(curr_speeds[i] - self.last_motor_speeds[i]) > 0.05:
                 self.last_motor_speeds[i] = curr_speeds[i]
-                self.curr_motor_inputs.motors[i].speed = self.last_motor_speeds[i]
+                self.curr_motor_inputs.inputs[i].speed = self.last_motor_speeds[i]
 
         # Motor 2 (the third motor) is controlled by the right joystick's H value.
         if abs(self.curr_joy_values[3] - self.last_joy_values[3]) > 0.05:
@@ -192,7 +251,7 @@ class REVHubInputsTranslator:
             self.curr_motor_inputs.print_inputs()
 
 
-    def get_motor_control_input(self, print_input=False):
+    def get_motor_inputs(self, print_input=False):
         "Genrate motor inputs based on the current GamePad report."
         curr_motor_speeds = self.get_curr_motor_speed_from_joy_values(print_input)
         self.get_motor_inputs_from_speeds(curr_motor_speeds, print_input)

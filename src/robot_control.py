@@ -8,7 +8,7 @@ import time
 
 # Self-defined submoduels
 import GamePad
-from REVHubController import REVHubInputsTranslator
+from REVHubTranslator import REVHubInputsTranslator
 
 # from REVHubInterface import REVcomm
 
@@ -56,7 +56,8 @@ while True:
     report = gpad_device.get_gamepad_report()
     if report:
         translator.get_raw_state_from_report(report)
-        translator.get_motor_control_input(True)
+        translator.get_motor_inputs(True)
+        translator.get_servo_inputs(True)
     else:
         print('\nUnable to get controller state')
-        time.sleep(2)
+        time.sleep(1)
