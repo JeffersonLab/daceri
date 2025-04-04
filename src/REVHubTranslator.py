@@ -8,6 +8,7 @@ import math
 
 MOTOR_NUM = 3
 MOTOR_INIT_SPEED = -1.0
+MOTOR_POWER_TO_SPEED_FACTOR = 32000
 
 # The pulse width for the servo is in the range of 0.75ms to 2.25ms
 SERVO_PULSE_MIN = 0.75
