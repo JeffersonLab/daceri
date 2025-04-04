@@ -25,13 +25,12 @@ class ServoInput:
         """
         self.sid = sid
         self.pos = 0.0  # the relative position of the servo pulse width
-        self.pulse_width = SERVO_PULSE_MIN  # the pulse width of the servo in ms
 
-    def get_pulse_width(self):
+    def get_pulse_width(self, pos):
         """
         Update the pulse width based on the current position.
         """
-        self.pulse_width = self.pos * SERVO_PULSE_RANGE + SERVO_PULSE_MIN
+        return pos * SERVO_PULSE_RANGE + SERVO_PULSE_MIN
 
 
 class REVServoInputs:
@@ -43,16 +42,14 @@ class REVServoInputs:
         for sid in [0, 1, 4, 5]:
             self.inputs_dict['S' + str(sid)] = ServoInput(sid)
 
-    def update_servo_pulse_width(self):
+    def update_servo_position(self):
         """
-        Update the pulse width for each servo based on its position.
+        Update the pos for each servo based on GamePad inputs.
         """
         for _, servo_input in self.inputs_dict.items():
             # Ensure the position is within the valid range [0.0, 1.0]
             servo_input.pos = max(servo_input.pos, 0.0)
             servo_input.pos = min(servo_input.pos, 1.0)
-            # Update the pulse width based on the position
-            servo_input.get_pulse_width()
 
     def print_inputs(self):
         """
@@ -60,7 +57,7 @@ class REVServoInputs:
         """
         print("\nServo inputs:")
         for key, servo_input in self.inputs_dict.items():
-            print(f"\t{key}: pos={servo_input.pos}, pulse_width={servo_input.pulse_width}")
+            print(f"\t{key}: pos={servo_input.pos}")
 
 
 class MotorInput:
@@ -199,7 +196,7 @@ class REVHubInputsTranslator:
             self.curr_servo_inputs.inputs_dict['S5'].pos -= 0.01
 
         # Update the pulse width for each servo based on its neew position
-        self.curr_servo_inputs.update_servo_pulse_width()
+        self.curr_servo_inputs.update_servo_position()
 
         if print_input:
             self.curr_servo_inputs.print_inputs()
