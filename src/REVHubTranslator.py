@@ -9,16 +9,28 @@ import math
 MOTOR_NUM = 3
 MOTOR_INIT_SPEED = -1.0
 
+# The pulse width for the servo is in the range of 0.75ms to 2.25ms
+SERVO_PULSE_MIN = 0.75
+SERVO_PULSE_MAX = 2.25
+SERVO_PULSE_RANGE = SERVO_PULSE_MAX - SERVO_PULSE_MIN
+
 class ServoInput:
     """Represents the input for a single servo, including its ID and position."""
     def __init__(self, sid=-1):
         """
         Initialize a ServoInput instance.
         Args:
-            sid (int): Servo ID. Valid IDs are 0, 1, and 2. Defaults to -1.
+            sid (int): Servo ID.
         """
         self.sid = sid
-        self.period_inc = 0.0  # Servo period increment decied by the GamePad report
+        self.pos = 0.0  # the relative position of the servo pulse width
+        self.pulse_width = SERVO_PULSE_MIN  # the pulse width of the servo in ms
+
+    def get_pulse_width(self):
+        """
+        Update the pulse width based on the current position.
+        """
+        self.pulse_width = self.pos * SERVO_PULSE_RANGE + SERVO_PULSE_MIN
 
 
 class REVServoInputs:
@@ -30,13 +42,24 @@ class REVServoInputs:
         for sid in [0, 1, 4, 5]:
             self.inputs_dict['S' + str(sid)] = ServoInput(sid)
 
+    def update_servo_pulse_width(self):
+        """
+        Update the pulse width for each servo based on its position.
+        """
+        for _, servo_input in self.inputs_dict.items():
+            # Ensure the position is within the valid range [0.0, 1.0]
+            servo_input.pos = max(servo_input.pos, 0.0)
+            servo_input.pos = min(servo_input.pos, 1.0)
+            # Update the pulse width based on the position
+            servo_input.get_pulse_width()
+
     def print_inputs(self):
         """
         Print the current servo inputs, including servo IDs and period increments.
         """
         print("\nServo inputs:")
         for key, servo_input in self.inputs_dict.items():
-            print(f"\t{key}: period_inc={servo_input.period_inc}")
+            print(f"\t{key}: pos={servo_input.pos}, pulse_width={servo_input.pulse_width}")
 
 
 class MotorInput:
@@ -155,24 +178,27 @@ class REVHubInputsTranslator:
         """
         # Servo 0: S0
         if self.raw_state['dpad_up']:
-            self.curr_servo_inputs.inputs_dict['S0'].period_inc = 0.01
+            self.curr_servo_inputs.inputs_dict['S0'].pos += 0.01
         if self.raw_state['dpad_down']:
-            self.curr_servo_inputs.inputs_dict['S0'].period_inc = -0.01
+            self.curr_servo_inputs.inputs_dict['S0'].pos -= 0.01
         # Servo 1: S1
         if self.raw_state['dpad_left']:
-            self.curr_servo_inputs.inputs_dict['S1'].period_inc = 0.01
+            self.curr_servo_inputs.inputs_dict['S1'].pos += 0.01
         if self.raw_state['dpad_right']:
-            self.curr_servo_inputs.inputs_dict['S1'].period_inc = -0.01
+            self.curr_servo_inputs.inputs_dict['S1'].pos -= 0.01
         # Servo 4: S4
         if self.raw_state['button_Y']:
-            self.curr_servo_inputs.inputs_dict['S4'].period_inc = 0.01
+            self.curr_servo_inputs.inputs_dict['S4'].pos += 0.01
         if self.raw_state['button_A']:
-            self.curr_servo_inputs.inputs_dict['S4'].period_inc = -0.01
+            self.curr_servo_inputs.inputs_dict['S4'].pos -= 0.01
         # Servo 5: S5
         if self.raw_state['button_X']:
-            self.curr_servo_inputs.inputs_dict['S5'].period_inc = 0.01
+            self.curr_servo_inputs.inputs_dict['S5'].pos += 0.01
         if self.raw_state['button_B']:
-            self.curr_servo_inputs.inputs_dict['S5'].period_inc = -0.01
+            self.curr_servo_inputs.inputs_dict['S5'].pos -= 0.01
+
+        # Update the pulse width for each servo based on its neew position
+        self.curr_servo_inputs.update_servo_pulse_width()
 
         if print_input:
             self.curr_servo_inputs.print_inputs()
