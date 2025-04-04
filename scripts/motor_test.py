@@ -1,6 +1,6 @@
 """
 Test script for REV Expansion Hub.
-The first motor should be run for 3 seconds at 50% power and then stop.
+The first motor should be run for 3 seconds at certain speed and then stop.
 """
 
 
@@ -32,11 +32,6 @@ try:
     time.sleep(3)
     REVModules[0].motors[TEST_MOTOR_NUM].disable()
 
-
-    REVModules[0].i2cChannels[0].getDevices()
-    REVModules[0].i2cChannels[0].addIMU(str(0) + 'IMU')
-    REVModules[0].i2cChannels[0].getDevices()[str(0) + 'IMU'].initSensor()
-
 except Exception as e:
     print(e)
-    print("Error Searcing for Hubs")
+    print("Error Searching for Hubs")
