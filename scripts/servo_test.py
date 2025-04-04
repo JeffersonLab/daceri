@@ -22,7 +22,7 @@ module = REVModules[0]
 try:
     period = module.servos[TEST_SERVO_ID].getPeriod()
     pulse_width = module.servos[TEST_SERVO_ID].getPulseWidth()
-    print(f"Servo {TEST_SERVO_ID}: period={period}, pulse_width={pulse_width}")
+    print(f"Servo {TEST_SERVO_ID}: period={period} ms, pulse_width={pulse_width} ms")
 
 except (AttributeError, IndexError, RuntimeError) as e:  # Replace with specific exceptions
     print(e)
