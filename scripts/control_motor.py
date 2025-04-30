@@ -217,11 +217,12 @@ else:
 def move_motor(motor_id, speed):
     global REVModules
     
-    REVModules[0].motors[motor_id].setMode(0,1)
+    REVModules[0].motors[motor_id].setMode(0,0)
+    current = REVModules[0].motors[motor_id].getCurrent()
+    print(f"motor_id = {motor_id}, speed = {speed}. current = {current}")
+    REVModules[0].motors[motor_id].setPower(speed * 25000)
     REVModules[0].motors[motor_id].enable()
-    print(f"motor_id = {motor_id}, speed = {speed}")
-    REVModules[0].motors[motor_id].setPower(speed * 32000)
-    time.sleep(0.01)
+    time.sleep(0.001)
     
 def move_servo_pos(servo_id):
     global REVModules
@@ -261,6 +262,7 @@ for motor_num in range(4):
 # init pulse
 for servos in range(2):
     REVModules[0].servos[servos].setPulseWidth(1000)
+    
 
 
 #-------------------------------------
@@ -343,10 +345,12 @@ else:
 
             if( abs( P1 - last_P1 ) > 0.05 ):
                 last_P1 = P1
+
                 # cmd = "set M1 " + str(P1)
                 cmd = float(P1)
                 id = 0
                 move_motor(id, cmd)
+
                 # print(cmd)
             if( abs( P2 - last_P2 ) > 0.05 ):
                 last_P2 = P2
@@ -374,14 +378,14 @@ else:
             # Servo Controls
             # up-down servo
             if state['button_Y']:
-                move_servo_pos(1)
+                move_servo_pos(4)
             if state['button_A']:
-                move_servo_neg(1)
+                move_servo_neg(4)
             # Left-right servo
             if state['button_B']:
-                move_servo_pos(0)
+                move_servo_pos(5)
             if state['button_X']:
-                move_servo_neg(0)
+                move_servo_neg(5)
                 
             
 
