@@ -219,7 +219,7 @@ def move_motor(motor_id, speed):
     
     #REVModules[0].motors[motor_id].setMode(0,1)
     #current = REVModules[0].motors[motor_id].getCurrent()
-    # print(f"motor_id = {motor_id}, speed = {speed}. current = {current}")
+    print(f"motor_id = {motor_id}, speed = {speed}. current = {current}")
     REVModules[0].motors[motor_id].setPower(speed * 32000)
     #REVModules[0].motors[motor_id].enable()
     # time.sleep(0.001)
@@ -303,15 +303,15 @@ else:
             if state['R3']:
                 set_gamepad_enable_all(1)
 
-            if state['dpad_up'   ]: print("incr S0  0.01")
-            if state['dpad_down' ]: print("incr S0 -0.01")
-            if state['dpad_left' ]: print("incr S1  0.01")
-            if state['dpad_right']: print("incr S1 -0.01")
+            # if state['dpad_up'   ]: print("incr S0  0.01")
+            # if state['dpad_down' ]: print("incr S0 -0.01")
+            # if state['dpad_left' ]: print("incr S1  0.01")
+            # if state['dpad_right']: print("incr S1 -0.01")
 
-            if state['button_Y'  ]: print("incr S4  0.01")
-            if state['button_A'  ]: print("incr S4 -0.01")
-            if state['button_X'  ]: print("incr S5  0.01")
-            if state['button_B'  ]: print("incr S5 -0.01")
+            # if state['button_Y'  ]: print("incr S4  0.01")
+            # if state['button_A'  ]: print("incr S4 -0.01")
+            # if state['button_X'  ]: print("incr S5  0.01")
+            # if state['button_B'  ]: print("incr S5 -0.01")
 
             # For the joysticks we implement a deadband around zero
             # as well as the last value sent. This significantly 
@@ -345,23 +345,30 @@ else:
                 last_P1 = P1
                 cmd = float(P1)
                 REVModules[0].motors[0].setPower(cmd * 32000)
+                REVModules[0].motors[0].enable()
+                
 
             if( abs( P2 - last_P2 ) > 0.05 ):
                 last_P2 = P2
                 REVModules[0].motors[1].setPower(cmd * 32000)
+                REVModules[0].motors[1].enable()
                 
             if( abs( P3 - last_P3 ) > 0.05 ):
                 last_P3 = P3
                 cmd = float(P3)
                 REVModules[0].motors[2].setPower(cmd * 32000)
+                REVModules[0].motors[2].enable()
 
             # Elevator Control 
             if state['dpad_up']:
                 REVModules[0].motors[3].setPower(20000)
-            if state['dpad_down']:
-                REVModules[0].motors[3].setPower(20000)
+                REVModules[0].motors[3].enable()
+=            if state['dpad_down']:
+                REVModules[0].motors[3].setPower(-20000)
+                REVModules[0].motors[3].enable()
             if state['dpad_left'] or state['dpad_right']:
                 REVModules[0].motors[3].setPower(0)
+                REVModules[0].motors[3].enable()
             
             # Servo Controls
             # up-down servo
