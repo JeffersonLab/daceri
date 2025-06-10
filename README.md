@@ -1,5 +1,12 @@
 # robot-project
-Any code for the DACERI (DAta CEnter Robot Inspector) project in affiliation with Jefferson Lab.
+Any and all code for the DACERI (DAta CEnter Robot Inspector) project in affiliation with Jefferson Lab.
+
+## Example Video
+[Demonstration of the Robot](https://www.youtube.com/watch?v=JDuZJEAZcf4&t=47s)
+
+## Links
+- [Parts List](https://docs.google.com/spreadsheets/d/1oFqTVsd3Hdgb1OTtmRurlVj-2fMQM05GRbAsK3FwgG0/edit?usp=sharing)
+- [Thesis](https://drive.google.com/file/d/1kZYvtbdwQk6LjgCDchcMXePofmcdOxIe/view?usp=sharing)
 
 ## Run Simulation
 1. Download the respective file based on OS and architecture: [https://github.com/google-deepmind/mujoco/releases](https://github.com/google-deepmind/mujoco/releases/latest)
@@ -8,13 +15,13 @@ Any code for the DACERI (DAta CEnter Robot Inspector) project in affiliation wit
 4. Go into the **sim/** directory
 5. Drag-and-drop any .xml into the simulator
 
-## Print 3D model parts
+## Edit/Print 3D model parts
 1. Clone this repository
 2. Go into the **designs/** directory
 3. Choose any design you'd like
-4. Open in any CAD software and export as STL
+4. Open in any CAD software, make changes, and export as STL
 5. Use a program like [UltiMaker Cura](https://ultimaker.com/software/ultimaker-cura/) or [Prusa Slicer](https://github.com/prusa3d/PrusaSlicer/releases) and slice the STL file into GCODE
-6. Run on a 3D printer
+6. Run the GCODE file on a 3D printer
 
 ## Move the robot
 1. Clone this repository on both the client computer and the robot's R-Pi
@@ -49,11 +56,7 @@ Any code for the DACERI (DAta CEnter Robot Inspector) project in affiliation wit
      ```
 4. Plug in a controller (OS-dependent; usually [Linux](https://www.linuxmint.com/) works the best)
 5. Run the RobotController.py file (under the **scripts/** subdirectory) with the desired connection type:
-<<<<<<< Updated upstream
-   * Serial Sockets:
-=======
-   * Serial:
->>>>>>> Stashed changes
+   * Serial (Controller is plugged into the Raspberry Pi):
      ```
      python RobotController.py s
      ```
