@@ -50,6 +50,8 @@ from datetime import datetime
 from REVHubInterface import REVcomm 
 from REVHubInterface import REVModule
 from REVHubInterface import REVServo
+
+
 import time
 
 
@@ -216,31 +218,13 @@ else:
 
 def move_motor(motor_id, speed):
     global REVModules
-    
-    #REVModules[0].motors[motor_id].setMode(0,1)
-    #current = REVModules[0].motors[motor_id].getCurrent()
-    print(f"motor_id = {motor_id}, speed = {speed}. current = {current}")
+    REVModules[0].motors[motor_id].setMode(0,1)
+    REVModules[0].motors[motor_id].enable()
+    print(f"motor_id = {motor_id}, speed = {speed}")
     REVModules[0].motors[motor_id].setPower(speed * 32000)
-    #REVModules[0].motors[motor_id].enable()
-    # time.sleep(0.001)
-    
-def move_servo_pos(servo_id):
-    global REVModules
-    pulse = REVModules[0].servos[servo_id].getPulseWidth()
-    print(f"servo_id = {servo_id}, pulse = {pulse}")
-    if pulse < 2500:
-        REVModules[0].servos[servo_id].setPulseWidth(pulse + 100)
-        REVModules[0].servos[servo_id].enable()
-    
-def move_servo_neg(servo_id):
-    global REVModules
-    pulse = REVModules[0].servos[servo_id].getPulseWidth()
-    print(f"servo_id = {servo_id}, pulse = {pulse}")
-    if pulse > 500:
-        REVModules[0].servos[servo_id].setPulseWidth(pulse - 100)
-        REVModules[0].servos[servo_id].enable()
-    
-    
+    # time.sleep(0.01)
+
+
 
 commMod = REVcomm.REVcomm()
 commMod.openActivePort()
@@ -257,7 +241,6 @@ for motor_num in range(4):
     REVModules[0].motors[motor_num].enable()
     REVModules[0].motors[motor_num].setMode(0,1)
     print("Init done")
-    
     
 # init pulse
 for servos in range(2):
@@ -285,7 +268,6 @@ else:
     last_P1 = -1
     last_P2 = -1
     last_P3 = -1
-    
 
     while True:
         report = gpad.read(512)
@@ -295,6 +277,7 @@ else:
         # else:
             # time.sleep(1)
         #    print('Unable to get controller state')
+
 
         if state:
             message = ''
@@ -328,6 +311,7 @@ else:
 
             P1 = (2.0/3.0)*left_joy_H
             P2 = (-1.0/3.0)*left_joy_H+(1.0/math.sqrt(3.0))*left_joy_V
+
             P3 = (-1.0/3.0)*left_joy_H-(1.0/math.sqrt(3.0))*left_joy_V+(1.0/3.0)*right_joy_H
 
             # # Motors are reversed
@@ -338,62 +322,37 @@ else:
             if( abs(P1 ) < 0.05 ) :  P1 = 0
             if( abs(P2 ) < 0.05 ) :  P2 = 0
             if( abs(P3 ) < 0.05 ) :  P3 = 0
-        
 
 
             if( abs( P1 - last_P1 ) > 0.05 ):
                 last_P1 = P1
+                # cmd = "set M1 " + str(P1)
                 cmd = float(P1)
-                REVModules[0].motors[0].setPower(cmd * 32000)
-                REVModules[0].motors[0].enable()
-                
-
+                id = 0
+                move_motor(id, cmd)
+                # print(cmd)
             if( abs( P2 - last_P2 ) > 0.05 ):
                 last_P2 = P2
-                REVModules[0].motors[1].setPower(cmd * 32000)
-                REVModules[0].motors[1].enable()
-                
+                # cmd = "set M2 " + str(P2)
+                cmd = float(P2)
+                id = 1
+                move_motor(id, cmd)
+                # print(cmd)
             if( abs( P3 - last_P3 ) > 0.05 ):
                 last_P3 = P3
+                # cmd = "set M3 " + str(P3)
                 cmd = float(P3)
-                REVModules[0].motors[2].setPower(cmd * 32000)
-                REVModules[0].motors[2].enable()
+                id = 2
+                move_motor(id, cmd)
+                # print(cmd)
+            # if( abs( right_joy_H - last_right_joy_H ) > 0.05 ):
+                # last_right_joy_H = right_joy_H
+                # cmd = "set M3 " + str(last_right_joy_H)
+                # cmd = float(right_joy_H)
+                # id = 2
+                # move_motor(id, cmd)
+                # print(cmd)
+            # if message:
+                # print(message)
 
-            # Elevator Control 
-            if state['dpad_up']:
-                REVModules[0].motors[3].setPower(20000)
-                REVModules[0].motors[3].enable()
-=            if state['dpad_down']:
-                REVModules[0].motors[3].setPower(-20000)
-                REVModules[0].motors[3].enable()
-            if state['dpad_left'] or state['dpad_right']:
-                REVModules[0].motors[3].setPower(0)
-                REVModules[0].motors[3].enable()
-            
-            # Servo Controls
-            # up-down servo
-            if state['button_Y']:
-                move_servo_pos(4)
-            if state['button_A']:
-                move_servo_neg(4)
-            # Left-right servo
-            if state['button_B']:
-                move_servo_pos(5)
-            if state['button_X']:
-                move_servo_neg(5)
-                
-            
-
-            
-
-
-        
-
-
-
-    
-
-
-
-        # time.sleep(0.1)
 
