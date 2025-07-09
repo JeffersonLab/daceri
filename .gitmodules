@@ -1,3 +1,9 @@
+[submodule "external/REVHubInterface"]
+	path = external/REVHubInterface
+	url = https://github.com/unofficial-rev-port/REVHubInterface.git
+[submodule "external/hidapi"]
+	path = external/hidapi
+	url = https://github.com/libusb/hidapi.git
 [submodule "CamStream"]
 	path = CamStream
 	url = git@github.com:cissieAB/CamStream.git
