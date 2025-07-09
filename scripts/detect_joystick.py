@@ -38,13 +38,9 @@
 """
 
 import math
-import threading
 import time
 import sys
-import os
-import subprocess
 import hid
-from datetime import datetime
 
 
 #-------------------------------------

@@ -49,6 +49,9 @@ from datetime import datetime
 
 from REVHubInterface import REVcomm 
 from REVHubInterface import REVModule
+from REVHubInterface import REVServo
+
+
 import time
 
 
@@ -223,7 +226,6 @@ def move_motor(motor_id, speed):
 
 
 
-
 commMod = REVcomm.REVcomm()
 commMod.openActivePort()
 REVModules = commMod.discovery()
@@ -239,6 +241,11 @@ for motor_num in range(4):
     REVModules[0].motors[motor_num].enable()
     REVModules[0].motors[motor_num].setMode(0,1)
     print("Init done")
+    
+# init pulse
+for servos in range(2):
+    REVModules[0].servos[servos].setPulseWidth(1000)
+    
 
 
 #-------------------------------------
@@ -266,9 +273,11 @@ else:
         report = gpad.read(512)
         if report:
             state = get_gamepad_state(report)
-        else:
-            time.sleep(1)
-            print('Unable to get controller state')
+            
+        # else:
+            # time.sleep(1)
+        #    print('Unable to get controller state')
+
 
         if state:
             message = ''
@@ -277,15 +286,15 @@ else:
             if state['R3']:
                 set_gamepad_enable_all(1)
 
-            if state['dpad_up'   ]: print("incr S0  0.01")
-            if state['dpad_down' ]: print("incr S0 -0.01")
-            if state['dpad_left' ]: print("incr S1  0.01")
-            if state['dpad_right']: print("incr S1 -0.01")
+            # if state['dpad_up'   ]: print("incr S0  0.01")
+            # if state['dpad_down' ]: print("incr S0 -0.01")
+            # if state['dpad_left' ]: print("incr S1  0.01")
+            # if state['dpad_right']: print("incr S1 -0.01")
 
-            if state['button_Y'  ]: print("incr S4  0.01")
-            if state['button_A'  ]: print("incr S4 -0.01")
-            if state['button_X'  ]: print("incr S5  0.01")
-            if state['button_B'  ]: print("incr S5 -0.01")
+            # if state['button_Y'  ]: print("incr S4  0.01")
+            # if state['button_A'  ]: print("incr S4 -0.01")
+            # if state['button_X'  ]: print("incr S5  0.01")
+            # if state['button_B'  ]: print("incr S5 -0.01")
 
             # For the joysticks we implement a deadband around zero
             # as well as the last value sent. This significantly 
@@ -300,8 +309,9 @@ else:
             if( abs(right_joy_V) < 0.05 ) :  right_joy_V = 0
             if( abs(right_joy_H) < 0.05 ) :  right_joy_H = 0
 
-            P1 = (2.0/3.0)*left_joy_H+(1.0/3.0)*right_joy_H
-            P2 = (-1.0/3.0)*left_joy_H+(1.0/math.sqrt(3.0))*left_joy_V+(1.0/3.0)*right_joy_H
+            P1 = (2.0/3.0)*left_joy_H
+            P2 = (-1.0/3.0)*left_joy_H+(1.0/math.sqrt(3.0))*left_joy_V
+
             P3 = (-1.0/3.0)*left_joy_H-(1.0/math.sqrt(3.0))*left_joy_V+(1.0/3.0)*right_joy_H
 
             # # Motors are reversed
@@ -312,6 +322,7 @@ else:
             if( abs(P1 ) < 0.05 ) :  P1 = 0
             if( abs(P2 ) < 0.05 ) :  P2 = 0
             if( abs(P3 ) < 0.05 ) :  P3 = 0
+
 
             if( abs( P1 - last_P1 ) > 0.05 ):
                 last_P1 = P1
@@ -343,15 +354,5 @@ else:
                 # print(cmd)
             # if message:
                 # print(message)
-
-            
-
-
-        
-
-
-
-    
-
 
 
