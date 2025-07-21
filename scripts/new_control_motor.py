@@ -221,7 +221,7 @@ def move_motor(motor_id, speed):
     REVModules[0].motors[motor_id].setMode(0,1)
     REVModules[0].motors[motor_id].enable()
     print(f"motor_id = {motor_id}, speed = {speed}")
-    REVModules[0].motors[motor_id].setPower(speed * 5000)
+    REVModules[0].motors[motor_id].setPower(speed * 32000)
     # time.sleep(0.01)
 
 
@@ -319,40 +319,21 @@ else:
             P2 = -P2
             P3 = -P3
 
-            if( abs(P1 ) < 0.05 ) :  P1 = 0
-            if( abs(P2 ) < 0.05 ) :  P2 = 0
-            if( abs(P3 ) < 0.05 ) :  P3 = 0
+            if abs(P1) < 0.05: P1 = 0
+            if abs(P2) < 0.05: P2 = 0
+            if abs(P3) < 0.05: P3 = 0
 
-
-            if( abs( P1 - last_P1 ) > 0.05 ):
+            if P1 != 0 or abs(P1 - last_P1) > 0.01:
                 last_P1 = P1
-                # cmd = "set M1 " + str(P1)
-                cmd = float(P1)
-                id = 0
-                move_motor(id, cmd)
-                # print(cmd)
-            if( abs( P2 - last_P2 ) > 0.05 ):
+                move_motor(0, float(P1))
+
+            if P2 != 0 or abs(P2 - last_P2) > 0.01:
                 last_P2 = P2
-                # cmd = "set M2 " + str(P2)
-                cmd = float(P2)
-                id = 1
-                move_motor(id, cmd)
-                # print(cmd)
-            if( abs( P3 - last_P3 ) > 0.05 ):
+                move_motor(1, float(P2))
+
+            if P3 != 0 or abs(P3 - last_P3) > 0.01:
                 last_P3 = P3
-                # cmd = "set M3 " + str(P3)
-                cmd = float(P3)
-                id = 2
-                move_motor(id, cmd)
-                # print(cmd)
-            # if( abs( right_joy_H - last_right_joy_H ) > 0.05 ):
-                # last_right_joy_H = right_joy_H
-                # cmd = "set M3 " + str(last_right_joy_H)
-                # cmd = float(right_joy_H)
-                # id = 2
-                # move_motor(id, cmd)
-                # print(cmd)
-            # if message:
-                # print(message)
+                move_motor(2, float(P3))
+
 
 
