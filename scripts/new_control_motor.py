@@ -1,54 +1,69 @@
-import inputs
-import os
 import time
+import math
+import inputs
 
-# Track current power per motor (joystick value)
-last_P1 = 0
-last_P2 = 0
-last_P3 = 0
+# Mock motor controller (replace with real hardware interface)
+class Motor:
+    def __init__(self, id):
+        self.id = id
+        self.power = 0.0
 
-# Motor control (replace with actual motor command if needed)
-def move_motor(motor, power):
-    percent = int(power * 100)
-    print(f"Motor {motor} -> Power {percent}%")
-    # Example of real motor command (uncomment and edit this line):
-    # os.system(f"motorctl -m {motor} -p {percent}")
+    def setPower(self, power):
+        print(f"Motor {self.id}: Power set to {round(power, 3)}")
+        self.power = power
 
-# Map axis codes from Logitech F310
-AXIS_MAP = {
-    'ABS_Y': 0,   # Left joystick vertical
-    'ABS_RZ': 1,  # Right trigger
-    'ABS_Z': 2,   # Left trigger
-}
+motors = [Motor(0), Motor(1), Motor(2)]
 
-def normalize(value):
-    # Normalize analog value from [-32768, 32767] or [0, 255] to [-1.0, 1.0]
-    if value >= -32768 and value <= 32767:
-        return round(value / 32767, 2)
-    elif value >= 0 and value <= 255:
-        return round((value - 128) / 127, 2)
-    else:
-        return 0.0
+def move_motor(id, power):
+    motors[id].setPower(power)
 
-print("Controller initialized. Move joystick or triggers...")
+def main():
+    print("Listening for joystick input...")
 
-while True:
-    events = inputs.get_gamepad()
-    for event in events:
-        if event.ev_type == 'Absolute':
-            value = normalize(event.state)
+    last_cmd_time = [0, 0, 0]
+    min_cmd_interval = 0.05  # seconds
+    last_motor_powers = [0, 0, 0]
 
-            if event.code == 'ABS_Y':  # Motor 0
-                if value != last_P1:
-                    last_P1 = value
-                    move_motor(0, value)
+    left_joy_H = 0
+    left_joy_V = 0
+    right_joy_H = 0
 
-            elif event.code == 'ABS_RZ':  # Motor 1
-                if value != last_P2:
-                    last_P2 = value
-                    move_motor(1, value)
+    while True:
+        # Poll all events from the gamepad
+        events = inputs.get_gamepad()
+        for event in events:
+            if event.ev_type == "Absolute":
+                if event.code == "ABS_X":
+                    left_joy_H = event.state / 32768.0
+                elif event.code == "ABS_Y":
+                    left_joy_V = event.state / 32768.0
+                elif event.code == "ABS_RX":
+                    right_joy_H = event.state / 32768.0
 
-            elif event.code == 'ABS_Z':  # Motor 2
-                if value != last_P3:
-                    last_P3 = value
-                    move_motor(2, value)
+        current_time = time.time()
+
+        # Calculate motor powers
+        motor_powers = [0, 0, 0]
+        motor_powers[0] = -((2.0 / 3.0) * left_joy_H)
+        motor_powers[1] = -((-1.0 / 3.0) * left_joy_H + (1.0 / math.sqrt(3.0)) * left_joy_V)
+        motor_powers[2] = -((-1.0 / 3.0) * left_joy_H - (1.0 / math.sqrt(3.0)) * left_joy_V + (1.0 / 3.0) * right_joy_H)
+
+        # Apply deadband
+        for i in range(3):
+            if abs(motor_powers[i]) < 0.05:
+                motor_powers[i] = 0
+
+        # Update motors only if power change is significant and time has passed
+        for i in range(3):
+            if (
+                abs(motor_powers[i] - last_motor_powers[i]) > 0.05 and
+                (current_time - last_cmd_time[i]) > min_cmd_interval
+            ):
+                move_motor(i, motor_powers[i])
+                last_motor_powers[i] = motor_powers[i]
+                last_cmd_time[i] = current_time
+
+        time.sleep(0.01)  # Small delay to reduce CPU usage
+
+if __name__ == "__main__":
+    main()
