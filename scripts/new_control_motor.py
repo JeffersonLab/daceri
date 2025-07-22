@@ -1,55 +1,54 @@
 import inputs
-import time
 import os
+import time
 
-# Motor ports
-motor_ports = ["0", "1", "2"]
-last_values = [0.0, 0.0, 0.0]  # optional, currently unused
+# Track current power per motor (joystick value)
+last_P1 = 0
+last_P2 = 0
+last_P3 = 0
 
-def scale(x):
-    # Deadband filter: ignore tiny joystick noise
-    if abs(x) < 0.05:
-        return 0.0
-    else:
-        return x
-
+# Motor control (replace with actual motor command if needed)
 def move_motor(motor, power):
-    # Convert to percent
     percent = int(power * 100)
-    os.system(f"rev -m {motor} -p {percent}")
+    print(f"Motor {motor} -> Power {percent}%")
+    # Example of real motor command (uncomment and edit this line):
+    # os.system(f"motorctl -m {motor} -p {percent}")
+
+# Map axis codes from Logitech F310
+AXIS_MAP = {
+    'ABS_Y': 0,   # Left joystick vertical
+    'ABS_RZ': 1,  # Right trigger
+    'ABS_Z': 2,   # Left trigger
+}
+
+def normalize(value):
+    # Normalize analog value from [-32768, 32767] or [0, 255] to [-1.0, 1.0]
+    if value >= -32768 and value <= 32767:
+        return round(value / 32767, 2)
+    elif value >= 0 and value <= 255:
+        return round((value - 128) / 127, 2)
+    else:
+        return 0.0
+
+print("Controller initialized. Move joystick or triggers...")
 
 while True:
-    try:
-        # Read joystick events
-        events = inputs.get_gamepad()
+    events = inputs.get_gamepad()
+    for event in events:
+        if event.ev_type == 'Absolute':
+            value = normalize(event.state)
 
-        # Initialize powers
-        P1, P2, P3 = 0.0, 0.0, 0.0
+            if event.code == 'ABS_Y':  # Motor 0
+                if value != last_P1:
+                    last_P1 = value
+                    move_motor(0, value)
 
-        for event in events:
-            if event.ev_type == "Absolute":
-                # Read vertical axis on left stick
-                if event.code == "ABS_Y":
-                    P1 = scale(-event.state / 32768.0)  # reverse so forward is positive
-                # Read vertical axis on right stick
-                if event.code == "ABS_RY":
-                    P2 = scale(-event.state / 32768.0)
-                # D-Pad Up/Down for Motor 3
-                if event.code == "ABS_HAT0Y":
-                    if event.state == -1:
-                        P3 = 1.0
-                    elif event.state == 1:
-                        P3 = -1.0
-                    else:
-                        P3 = 0.0
+            elif event.code == 'ABS_RZ':  # Motor 1
+                if value != last_P2:
+                    last_P2 = value
+                    move_motor(1, value)
 
-        # Always send current motor power (ensures instant stop/start)
-        move_motor(0, P1)
-        move_motor(1, P2)
-        move_motor(2, P3)
-
-        time.sleep(0.01)  # 100Hz update rate
-
-    except Exception as e:
-        print(f"Error: {e}")
-        time.sleep(0.1)
+            elif event.code == 'ABS_Z':  # Motor 2
+                if value != last_P3:
+                    last_P3 = value
+                    move_motor(2, value)
