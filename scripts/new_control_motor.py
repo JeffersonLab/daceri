@@ -120,3 +120,4 @@ else:
             if abs(P3 - last_P3) > 0.05:
                 last_P3 = P3
                 move_motor(2, P3)
+                                                                    
