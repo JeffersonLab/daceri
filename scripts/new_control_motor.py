@@ -319,21 +319,23 @@ else:
             P2 = -P2
             P3 = -P3
 
-            if abs(P1) < 0.05: P1 = 0
-            if abs(P2) < 0.05: P2 = 0
-            if abs(P3) < 0.05: P3 = 0
+            if( abs(P1 ) < 0.05 ) :  P1 = 0
+            if( abs(P2 ) < 0.05 ) :  P2 = 0
+            if( abs(P3 ) < 0.05 ) :  P3 = 0
 
-            if P1 != 0 or abs(P1 - last_P1) > 0.01:
+
+            # Send motor updates always when value changes
+            if P1 != last_P1:
                 last_P1 = P1
-                move_motor(0, float(P1))
+                move_motor(0, P1)
 
-            if P2 != 0 or abs(P2 - last_P2) > 0.01:
+            if P2 != last_P2:
                 last_P2 = P2
-                move_motor(1, float(P2))
+                move_motor(1, P2)
 
-            if P3 != 0 or abs(P3 - last_P3) > 0.01:
+            if P3 != last_P3:
                 last_P3 = P3
-                move_motor(2, float(P3))
+                move_motor(2, P3)
 
 
 
