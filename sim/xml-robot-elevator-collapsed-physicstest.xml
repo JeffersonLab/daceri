@@ -1,0 +1,570 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mujoco model="triangular_base">
+
+	<!-- set some defaults for units and lighting -->
+	<compiler angle="degree" meshdir="./stl_exports/"/>
+
+	<option timestep=".00175"/>
+
+	<!-- import our stl files -->
+	<asset>
+		<mesh name="baseplate" file="baseplate_robot-new.stl" />
+		<mesh name="elevator" file="elevator-collapsed-new.stl" />
+		<mesh name="wheel" file="wheel_for_mujoco.stl" />
+		<mesh name="ramp_mesh" file="cable_ramp.stl" scale="0.0015 0.0015 0.0015"/>
+	</asset>
+
+	<!-- define our robot model -->
+	<worldbody>
+		<!-- set up a light pointing down on the robot -->
+		<light directional="true" pos="-0.5 0.5 3" dir="0 0 -1" />
+		<camera name="track_camera" mode="targetbodycom" target="base" euler="0 0 0" fovy="80" pos="0 0 2" />
+		<!-- add a floor so we don't stare off into the abyss -->
+		<geom name="floor" pos="0 0 0" size="50 50 50" type="plane" rgba="1 0.83 0.61 0.5"/>
+		
+
+		<body name="ramp" pos="-1 1 0">
+        	<geom type="mesh" mesh="ramp_mesh" condim="3" friction="1 0.005 0.0001" rgba="0.6 0.4 0.2 1" euler="90 135 0"/>
+    	</body>
+
+
+		<!-- start building our model -->
+		
+		<body name="base" pos="0 0 0.025">                <!-- 2.5 cm above floor -->
+			<!-- free joint with more damping to kill micro‑oscillations -->
+			<joint name="joint_base" type="free"
+				damping="0.2" frictionloss="0"/>
+
+			<!-- the mesh now sits on the floor, so drop its z‑offset back to 0 -->
+			<geom name="baseplate_robot" type="mesh"
+				mesh="baseplate" pos="0 0 0" friction="0.5"/>
+
+			<!-- COM sits 1 cm above the plate → global COM at z = 0.035 m -->
+			<inertial pos="0 0 0.01"
+					mass="2.338"
+					fullinertia="0.012 0.012 0.02257 0.000158 0.000113 0.000233"/>
+
+			<body name="elevator" pos=".01 0 0">
+				<!--<joint name="slide_x" type="slide" axis="1 0 0" range="-.0025 .0025"/>-->
+				<joint name="slide_y" type="slide" axis="0 1 0" range="-.001 .001"/>
+				<geom name="elevator" type="mesh" mesh="elevator"/>
+				<inertial pos="0 0 0.345" mass="0.9434" fullinertia="0.03169 0.0004843 0.03133 0 0 0.000503"/>
+				<!-- Optional: Adding a site to specify sensor location -->
+				<site name="base_site" pos="0 0 .35" size="0.01" type="sphere" rgba="0 1 0 1"/>
+			</body>
+
+			<!-- Attach wheels to the main body -->
+			<!--							cos(15 degree)	sin(15 degree)-->
+			<body name="wheel_1_body" pos=".175 -.07 0" quat="0.5 1 0 .866">
+				<joint name="joint1" type="hinge" axis="0 0 -1" damping=".05"/>
+				<geom type="cylinder" size=".048 .01" rgba=".7 0.83 0.61 1" />
+
+				<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+				<inertial pos="0 0 0" mass="0.066235" fullinertia="7.17e-5 7.17e-5 3.64e-5 0 0 0"/>
+
+				<body name="wheel_1_omni0" pos="0 -.0435 0" quat="0 -1 0 1" >
+					<joint name="joint1_omni0" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_1_omni1" pos="0 .0435 0" quat="0 -1 0 1">
+					<joint name="joint1_omni1" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_1_omni2" pos=".0435 0 0" quat="1 1 0 0">
+					<joint name="joint1_omni2" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_1_omni3" pos="-.0435 0 0" quat="1 1 0 0">
+					<joint name="joint1_omni3" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_1_omni4" pos="-.0312 -.0312 0" quat="0.676 0.227 0.661 -.233">
+					<joint name="joint1_omni4" type="hinge" axis="0 0 1" damping="0.0001"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_1_omni5" pos=".0312 -.0312 0" quat="0.661 -0.268 0.645 .274">
+					<joint name="joint1_omni5" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_1_omni6" pos=".0312 .0312 0" quat="0.276 -0.642 0.268 .663">
+					<joint name="joint1_omni6" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_1_omni7" pos="-.0312 .0312 0" quat="-0.276 -0.642 -0.268 .663">
+					<joint name="joint1_omni7" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+
+				<!-- Attached Wheel -->
+
+				<body name="wheel_1_body1" pos="0 0 0.025" quat="0.195 0 0 0.975">
+					<geom type="cylinder" size=".048 .01" rgba=".7 0.83 0.61 1" />
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.066235" fullinertia="7.17e-5 7.17e-5 3.64e-5 0 0 0"/>
+
+					<body name="wheel_1_1omni0" pos="0 -.0435 0" quat="0 -1 0 1">
+						<joint name="joint1_1omni0" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0" />
+
+						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+					</body>
+
+					<body name="wheel_1_1omni1" pos="0 .0435 0" quat="0 -1 0 1">
+						<joint name="joint1_1omni1" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					</body>
+
+					<body name="wheel_1_1omni2" pos=".0435 0 0" quat="1 1 0 0">
+						<joint name="joint1_1omni2" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+					</body>
+
+					<body name="wheel_1_1omni3" pos="-.0435 0 0" quat="1 1 0 0">
+						<joint name="joint1_1omni3" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+					</body>
+
+					<body name="wheel_1_1omni4" pos="-.0312 -.0312 0" quat="0.676 0.227 0.661 -.233">
+						<joint name="joint1_1omni4" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+					</body>
+
+					<body name="wheel_1_1omni5" pos=".0312 -.0312 0" quat="0.661 -0.268 0.645 .274">
+						<joint name="joint1_1omni5" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+					</body>
+
+					<body name="wheel_1_1omni6" pos=".0312 .0312 0" quat="0.276 -0.642 0.268 .663">
+						<joint name="joint1_1omni6" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+					</body>
+
+					<body name="wheel_1_1omni7" pos="-.0312 .0312 0" quat="-0.276 -0.642 -0.268 .663">
+						<joint name="joint1_1omni7" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+					</body>
+
+				</body>
+
+
+			</body>
+
+			<body name="wheel_2_body" pos="0 .24 0" quat="1 1 0 0"> <!-- This quat makes cylinder parallel with 3D y-axis and straight up -->
+				<joint name="joint2" type="hinge" axis="0 0 1" damping=".05"/> <!-- GOOD -->
+				<geom type="cylinder" size=".048 .01" rgba=".5 0.3 0.61 1" />
+				<inertial pos="0 0 0.9" mass="0.066235" fullinertia="7.17e-5 7.17e-5 3.64e-5 0 0 0"/>
+
+				<body name="wheel_2_omni0" pos="0 -.0435 0" quat="0 -1 0 1">
+					<joint name="joint2_omni0" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_2_omni1" pos="0 .0435 0" quat="0 -1 0 1">
+					<joint name="joint2_omni1" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_2_omni2" pos=".0435 0 0" quat="1 1 0 0">
+					<joint name="joint2_omni2" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_2_omni3" pos="-.0435 0 0" quat="1 1 0 0">
+					<joint name="joint2_omni3" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_2_omni4" pos="-.0312 -.0312 0" quat="0.676 0.227 0.661 -.233">
+					<joint name="joint2_omni4" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_2_omni5" pos=".0312 -.0312 0" quat="0.661 -0.268 0.645 .274">
+					<joint name="joint2_omni5" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_2_omni6" pos=".0312 .0312 0" quat="0.276 -0.642 0.268 .663">
+					<joint name="joint2_omni6" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_2_omni7" pos="-.0312 .0312 0" quat="-0.276 -0.642 -0.268 .663">
+					<joint name="joint2_omni7" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<!-- Second Wheel -->
+
+				<!-- Second Second Wheel -->
+
+				<body name="wheel_2_body1" pos="0 0 -0.027" quat="0.195 0 0 0.975">
+					<geom type="cylinder" size=".048 .01" rgba=".5 0.3 0.61 1" />
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0.9" mass="0.066235" fullinertia="7.17e-5 7.17e-5 3.64e-5 0 0 0"/>
+
+					<body name="wheel_2_1omni0" pos="0 -.0435 0" quat="0 -1 0 1">
+						<joint name="joint2_1omni0" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+					</body>
+
+					<body name="wheel_2_1omni1" pos="0 .0435 0" quat="0 -1 0 1">
+						<joint name="joint2_1omni1" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					</body>
+
+					<body name="wheel_2_1omni2" pos=".0435 0 0" quat="1 1 0 0">
+						<joint name="joint2_1omni2" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+					</body>
+
+					<body name="wheel_2_1omni3" pos="-.0435 0 0" quat="1 1 0 0">
+						<joint name="joint2_1omni3" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+					</body>
+
+					<body name="wheel_2_1omni4" pos="-.0312 -.0312 0" quat="0.676 0.227 0.661 -.233">
+						<joint name="joint2_1omni4" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+					</body>
+
+					<body name="wheel_2_1omni5" pos=".0312 -.0312 0" quat="0.661 -0.268 0.645 .274">
+						<joint name="joint2_1omni5" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+					</body>
+
+					<body name="wheel_2_1omni6" pos=".0312 .0312 0" quat="0.276 -0.642 0.268 .663">
+						<joint name="joint2_1omni6" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+					</body>
+
+					<body name="wheel_2_1omni7" pos="-.0312 .0312 0" quat="-0.276 -0.642 -0.268 .663">
+						<joint name="joint2_1omni7" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+					</body>
+				</body>
+			</body>
+
+			<body name="wheel_3_body" pos="-.175 -.07 0" quat="-0.5 1 0 .866">
+				<joint name="joint3" type="hinge" axis="0 0 1" damping=".05" />
+				<geom type="cylinder" size=".048 .01" rgba=".1 0.3 0.61 1" />
+				<inertial pos="0 0 0.9" mass="0.066235" fullinertia="7.17e-5 7.17e-5 3.64e-5 0 0 0"/>
+
+				<body name="wheel_3_omni0" pos="0 -.0435 0" quat="0 -1 0 1">
+					<joint name="joint3_omni0" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_3_omni1" pos="0 .0435 0" quat="0 -1 0 1">
+					<joint name="joint3_omni1" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_3_omni2" pos=".0435 0 0" quat="1 1 0 0">
+					<joint name="joint3_omni2" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_3_omni3" pos="-.0435 0 0" quat="1 1 0 0">
+					<joint name="joint3_omni3" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_3_omni4" pos="-.0312 -.0312 0" quat="0.676 0.227 0.661 -.233">
+					<joint name="joint3_omni4" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_3_omni5" pos=".0312 -.0312 0" quat="0.661 -0.268 0.645 .274">
+					<joint name="joint3_omni5" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_3_omni6" pos=".0312 .0312 0" quat="0.276 -0.642 0.268 .663">
+					<joint name="joint3_omni6" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_3_omni7" pos="-.0312 .0312 0" quat="-0.276 -0.642 -0.268 .663">
+					<joint name="joint3_omni7" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<!-- Second Wheel -->
+
+				<!-- Second Wheel -->
+
+			<body name="wheel_3_body1" pos="0 0 -0.027" quat="0.195 0 0 0.975">
+				<geom type="cylinder" size=".048 .01" rgba=".1 0.3 0.61 1"/>
+
+				<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+				<inertial pos="0 0 0.9" mass="0.066235" fullinertia="7.17e-5 7.17e-5 3.64e-5 0 0 0"/>
+
+				<body name="wheel_3_1omni0" pos="0 -.0435 0" quat="0 -1 0 1">
+					<joint name="joint3_1omni0" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_3_1omni1" pos="0 .0435 0" quat="0 -1 0 1">
+					<joint name="joint3_1omni1" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+				</body>
+
+				<body name="wheel_3_1omni2" pos=".0435 0 0" quat="1 1 0 0">
+					<joint name="joint3_1omni2" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+				</body>
+
+				<body name="wheel_3_1omni3" pos="-.0435 0 0" quat="1 1 0 0">
+					<joint name="joint3_1omni3" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+			 		<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+				</body>
+
+				<body name="wheel_3_1omni4" pos="-.0312 -.0312 0" quat="0.676 0.227 0.661 -.233">
+					<joint name="joint3_1omni4" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_3_1omni5" pos=".0312 -.0312 0" quat="0.661 -0.268 0.645 .274">
+					<joint name="joint3_1omni5" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_3_1omni6" pos=".0312 .0312 0" quat="0.276 -0.642 0.268 .663">
+					<joint name="joint3_1omni6" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+				<body name="wheel_3_1omni7" pos="-.0312 .0312 0" quat="-0.276 -0.642 -0.268 .663">
+					<joint name="joint3_1omni7" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
+					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
+
+			 		<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
+					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+
+				</body>
+
+			</body>
+
+
+			</body>
+		</body>
+	</worldbody>
+
+	<!-- attach actuators to joints -->
+	<actuator>
+		<velocity name="joint1_motor" joint="joint1" ctrlrange="-302.7 302.7" ctrllimited="true" gear="19.2" kv="3"/>
+
+		<velocity name="joint2_motor" joint="joint2" ctrlrange="-302.7 302.7" ctrllimited="true" gear="19.2" kv="3"/>
+
+		<velocity name="joint3_motor" joint="joint3" ctrlrange="-302.7 302.7" ctrllimited="true" gear="19.2" kv="3"/>
+
+	</actuator>
+
+	<sensor>
+		<actuatorfrc name="joint1_motor" actuator="joint1_motor"/>
+		<actuatorfrc name="joint2_motor" actuator="joint2_motor"/>
+		<actuatorfrc name="joint3_motor" actuator="joint3_motor"/>
+	<!--	<actuatorfrc name="damper1" actuator="damper1"/>
+		<actuatorfrc name="damper2" actuator="damper2"/>
+		<actuatorfrc name="damper3" actuator="damper3"/>-->
+
+		<jointactuatorfrc name="joint1" joint="joint1"/>
+		<jointactuatorfrc name="joint2" joint="joint2"/>
+		<jointactuatorfrc name="joint3" joint="joint3"/>
+
+	<!--	<accelerometer name="accelerometer" site="base_site"/>-->
+	</sensor>
+
+</mujoco>
