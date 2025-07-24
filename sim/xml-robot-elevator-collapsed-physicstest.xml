@@ -21,53 +21,41 @@
 		<camera name="track_camera" mode="targetbodycom" target="base" euler="0 0 0" fovy="80" pos="0 0 2" />
 		<!-- add a floor so we don't stare off into the abyss -->
 		<geom name="floor" pos="0 0 0" size="50 50 50" type="plane" rgba="1 0.83 0.61 0.5"/>
-		
 
 		<body name="ramp" pos="-1 1 0">
         	<geom type="mesh" mesh="ramp_mesh" condim="3" friction="1 0.005 0.0001" rgba="0.6 0.4 0.2 1" euler="90 135 0"/>
     	</body>
 
-
 		<!-- start building our model -->
-		
-		<body name="base" pos="0 0 0.025">                <!-- 2.5 cm above floor -->
-			<!-- free joint with more damping to kill micro‑oscillations -->
-			<joint name="joint_base" type="free"
-				damping="0.2" frictionloss="0"/>
+		<body name="base" pos="0 0 -0.7">
+			<joint name="joint_base" type="free" axis="0 0 1" frictionloss="1" damping="0.001" stiffness="0.2"/>
+			<geom name="baseplate_robot" type="mesh" mesh="baseplate" pos="0 0 1" friction="0.5" />
+			<inertial pos="-.05 0 0.0133" mass="5" fullinertia="0.531679 0.531679 1 0.007000 0.005007 0.010323"/>
 
-			<!-- the mesh now sits on the floor, so drop its z‑offset back to 0 -->
-			<geom name="baseplate_robot" type="mesh"
-				mesh="baseplate" pos="0 0 0" friction="0.5"/>
-
-			<!-- COM sits 1 cm above the plate → global COM at z = 0.035 m -->
-			<inertial pos="0 0 0.01"
-					mass="2.338"
-					fullinertia="0.012 0.012 0.02257 0.000158 0.000113 0.000233"/>
-
-			<body name="elevator" pos=".01 0 0">
+			<body name="elevator" pos=".01 0 1">
 				<!--<joint name="slide_x" type="slide" axis="1 0 0" range="-.0025 .0025"/>-->
 				<joint name="slide_y" type="slide" axis="0 1 0" range="-.001 .001"/>
 				<geom name="elevator" type="mesh" mesh="elevator"/>
-				<inertial pos="0 0 0.345" mass="0.9434" fullinertia="0.03169 0.0004843 0.03133 0 0 0.000503"/>
+				<inertial pos="0 0 0.345" mass="0.2" fullinertia="1 0.015282 0.988640 0 0 0.015873"/>
 				<!-- Optional: Adding a site to specify sensor location -->
 				<site name="base_site" pos="0 0 .35" size="0.01" type="sphere" rgba="0 1 0 1"/>
 			</body>
 
 			<!-- Attach wheels to the main body -->
 			<!--							cos(15 degree)	sin(15 degree)-->
-			<body name="wheel_1_body" pos=".175 -.07 0" quat="0.5 1 0 .866">
+			<body name="wheel_1_body" pos=".175 -.07 1" quat="0.5 1 0 .866">
 				<joint name="joint1" type="hinge" axis="0 0 -1" damping=".05"/>
 				<geom type="cylinder" size=".048 .01" rgba=".7 0.83 0.61 1" />
 
 				<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-				<inertial pos="0 0 0" mass="0.066235" fullinertia="7.17e-5 7.17e-5 3.64e-5 0 0 0"/>
+				<inertial pos="0 0 0" mass=".096" diaginertia="0.5 0.5 1"/>
 
 				<body name="wheel_1_omni0" pos="0 -.0435 0" quat="0 -1 0 1" >
 					<joint name="joint1_omni0" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -76,7 +64,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -85,7 +73,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass=".001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -94,7 +82,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -103,7 +91,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -112,7 +100,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -121,7 +109,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -130,7 +118,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -141,14 +129,14 @@
 					<geom type="cylinder" size=".048 .01" rgba=".7 0.83 0.61 1" />
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.066235" fullinertia="7.17e-5 7.17e-5 3.64e-5 0 0 0"/>
+					<inertial pos="0 0 0" mass=".096" diaginertia="0.5 0.5 1"/>
 
 					<body name="wheel_1_1omni0" pos="0 -.0435 0" quat="0 -1 0 1">
 						<joint name="joint1_1omni0" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
 						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0" />
 
 						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+						<inertial pos="0 0 0" mass=".001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 					</body>
 
@@ -157,7 +145,7 @@
 						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+						<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 					</body>
 
 					<body name="wheel_1_1omni2" pos=".0435 0 0" quat="1 1 0 0">
@@ -165,7 +153,7 @@
 						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+						<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 					</body>
 
@@ -174,7 +162,7 @@
 						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+						<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 					</body>
 
@@ -183,7 +171,7 @@
 						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+						<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 					</body>
 
@@ -192,7 +180,7 @@
 						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+						<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 					</body>
 
@@ -201,7 +189,7 @@
 						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+						<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 					</body>
 
@@ -210,7 +198,7 @@
 						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+						<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 					</body>
 
@@ -219,17 +207,17 @@
 
 			</body>
 
-			<body name="wheel_2_body" pos="0 .24 0" quat="1 1 0 0"> <!-- This quat makes cylinder parallel with 3D y-axis and straight up -->
+			<body name="wheel_2_body" pos="0 .24 1" quat="1 1 0 0"> <!-- This quat makes cylinder parallel with 3D y-axis and straight up -->
 				<joint name="joint2" type="hinge" axis="0 0 1" damping=".05"/> <!-- GOOD -->
 				<geom type="cylinder" size=".048 .01" rgba=".5 0.3 0.61 1" />
-				<inertial pos="0 0 0.9" mass="0.066235" fullinertia="7.17e-5 7.17e-5 3.64e-5 0 0 0"/>
+				<inertial pos="0 0 0.9" mass=".096" diaginertia="0.5 0.5 1"/>
 
 				<body name="wheel_2_omni0" pos="0 -.0435 0" quat="0 -1 0 1">
 					<joint name="joint2_omni0" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -238,7 +226,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -247,7 +235,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -256,7 +244,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -265,7 +253,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -274,7 +262,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -283,7 +271,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -292,7 +280,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -304,14 +292,14 @@
 					<geom type="cylinder" size=".048 .01" rgba=".5 0.3 0.61 1" />
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0.9" mass="0.066235" fullinertia="7.17e-5 7.17e-5 3.64e-5 0 0 0"/>
+					<inertial pos="0 0 0.9" mass=".096" diaginertia="0.5 0.5 1"/>
 
 					<body name="wheel_2_1omni0" pos="0 -.0435 0" quat="0 -1 0 1">
 						<joint name="joint2_1omni0" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
 						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+						<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 					</body>
 
@@ -320,7 +308,7 @@
 						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+						<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 					</body>
 
 					<body name="wheel_2_1omni2" pos=".0435 0 0" quat="1 1 0 0">
@@ -328,7 +316,7 @@
 						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+						<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 					</body>
 
@@ -337,7 +325,7 @@
 						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+						<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 					</body>
 
@@ -346,7 +334,7 @@
 						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+						<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 					</body>
 
@@ -355,7 +343,7 @@
 						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+						<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 					</body>
 
@@ -364,7 +352,7 @@
 						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+						<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 					</body>
 
@@ -373,23 +361,23 @@
 						<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 						<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-						<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+						<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 					</body>
 				</body>
 			</body>
 
-			<body name="wheel_3_body" pos="-.175 -.07 0" quat="-0.5 1 0 .866">
+			<body name="wheel_3_body" pos="-.175 -.07 1" quat="-0.5 1 0 .866">
 				<joint name="joint3" type="hinge" axis="0 0 1" damping=".05" />
 				<geom type="cylinder" size=".048 .01" rgba=".1 0.3 0.61 1" />
-				<inertial pos="0 0 0.9" mass="0.066235" fullinertia="7.17e-5 7.17e-5 3.64e-5 0 0 0"/>
+				<inertial pos="0 0 0.9" mass=".096" diaginertia="0.5 0.5 1"/>
 
 				<body name="wheel_3_omni0" pos="0 -.0435 0" quat="0 -1 0 1">
 					<joint name="joint3_omni0" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -398,7 +386,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -407,7 +395,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -416,7 +404,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -425,7 +413,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -434,7 +422,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -443,7 +431,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -452,7 +440,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -464,14 +452,14 @@
 				<geom type="cylinder" size=".048 .01" rgba=".1 0.3 0.61 1"/>
 
 				<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-				<inertial pos="0 0 0.9" mass="0.066235" fullinertia="7.17e-5 7.17e-5 3.64e-5 0 0 0"/>
+				<inertial pos="0 0 0.9" mass=".096" diaginertia="0.5 0.5 1"/>
 
 				<body name="wheel_3_1omni0" pos="0 -.0435 0" quat="0 -1 0 1">
 					<joint name="joint3_1omni0" type="hinge" axis="0 0 1" damping="0.001" frictionloss="0.3"/>
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -480,7 +468,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 				</body>
 
 				<body name="wheel_3_1omni2" pos=".0435 0 0" quat="1 1 0 0">
@@ -488,7 +476,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 				</body>
 
 				<body name="wheel_3_1omni3" pos="-.0435 0 0" quat="1 1 0 0">
@@ -496,7 +484,7 @@
 			 		<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 				</body>
 
 				<body name="wheel_3_1omni4" pos="-.0312 -.0312 0" quat="0.676 0.227 0.661 -.233">
@@ -504,7 +492,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -513,7 +501,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -522,7 +510,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 					<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -531,7 +519,7 @@
 					<geom type="cylinder" size=".011 .011 .011" contype="1" conaffinity="0"/>
 
 			 		<!--<geom type="sphere" rgba="0 0 1 1" size=".1"/>-->
-					<inertial pos="0 0 0" mass="0.002826" fullinertia="3e-7 3e-7 3e-7 0 0 0"/>
+					<inertial pos="0 0 0" mass="0.001" fullinertia="0.00001 0.00001 0.00001 0 0 0"/>
 
 				</body>
 
@@ -544,11 +532,11 @@
 
 	<!-- attach actuators to joints -->
 	<actuator>
-		<velocity name="joint1_motor" joint="joint1" ctrlrange="-302.7 302.7" ctrllimited="true" gear="19.2" kv="3"/>
+		<velocity name="joint1_motor" joint="joint1" ctrlrange="-32.7 32.7" ctrllimited="true" gear="19.2" kv="3"/>
 
-		<velocity name="joint2_motor" joint="joint2" ctrlrange="-302.7 302.7" ctrllimited="true" gear="19.2" kv="3"/>
+		<velocity name="joint2_motor" joint="joint2" ctrlrange="-32.7 32.7" ctrllimited="true" gear="19.2" kv="3"/>
 
-		<velocity name="joint3_motor" joint="joint3" ctrlrange="-302.7 302.7" ctrllimited="true" gear="19.2" kv="3"/>
+		<velocity name="joint3_motor" joint="joint3" ctrlrange="-32.7 32.7" ctrllimited="true" gear="19.2" kv="3"/>
 
 	</actuator>
 
