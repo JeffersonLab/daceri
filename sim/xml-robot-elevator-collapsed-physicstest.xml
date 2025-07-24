@@ -30,7 +30,7 @@
 		<body name="base" pos="0 0 -0.7">
 			<joint name="joint_base" type="free" axis="0 0 1" frictionloss="1" damping="0.001" stiffness="0.2"/>
 			<geom name="baseplate_robot" type="mesh" mesh="baseplate" pos="0 0 1" friction="0.5" />
-			<inertial pos="-.05 0 0.0133" mass="5" fullinertia="0.531679 0.531679 1 0.007000 0.005007 0.010323"/>
+			<inertial pos="-.05 0 0.0133" mass="5" fullinertia="0.5511 0.5394 1 0.00424 0.01124 0.02398"/>
 
 			<body name="elevator" pos=".01 0 1">
 				<!--<joint name="slide_x" type="slide" axis="1 0 0" range="-.0025 .0025"/>-->
